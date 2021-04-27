@@ -482,7 +482,6 @@ def testLinuxMounts(host):
             key = "xfs_mount_options"
         # No specific option provided and no default set, don't check this mount point
         else:
-            printWarning("No xfs_mount_options provided for device %s and no default provided, skipping check")
             continue
 
         expectedOptions = set(gpcheck_config.xfs_mount_options[key].split(","))
