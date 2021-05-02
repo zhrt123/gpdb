@@ -284,9 +284,9 @@ select * from direct_test;
 INFO:  (slice 1) Dispatch command to ALL contents: 0 1 2
  key | value 
 -----+-------
-   1 | 100
      | cow
    2 | 100
+   1 | 100
 (3 rows)
 
 prepare test_update (int) as update direct_test set value = 'boo' where key = $1;
@@ -473,8 +473,7 @@ INFO:  (slice 1) Dispatch command to SINGLE content
 INFO:  Distributed transaction has SINGLE content persisted WAL
 INFO:  Distributed transaction command 'Distributed Prepare' to SINGLE content
 INFO:  Distributed transaction has SINGLE content persisted WAL
-INFO:  Distributed transaction command 'Distributed Commit Prepared' to SINGLE content
-INFO:  Distributed transaction command 'Distributed Commit (one-phase)' to PARTIAL contents: 0 2
+INFO:  Distributed transaction command 'Distributed Commit Prepared' to ALL contents: 0 1 2
 insert into ddtesttab values (1, 1, 5 + nextval('ddtestseq'));
 INFO:  (slice 0) Dispatch command to ALL contents: 0 1 2
 INFO:  (slice 1) Dispatch command to SINGLE content
@@ -829,9 +828,9 @@ INFO:  (slice 2) Dispatch command to ALL contents: 0 1 2
 INFO:  (slice 1) Dispatch command to ALL contents: 0 1 2
  gp_segment_id | count 
 ---------------+-------
+             2 |     2
              0 |     3
              1 |     1
-             2 |     2
 (3 rows)
 
 -- test direct dispatch via SQLValueFunction and FuncExpr for single row insertion.
