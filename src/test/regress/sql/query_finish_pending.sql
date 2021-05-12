@@ -79,3 +79,12 @@ select count(*) from _tmp_table1, _tmp_table2 where 100 / _tmp_table2.c2 > 1;
 select gp_inject_fault('before_read_command', 'reset', 2);
 drop table _tmp_table1;
 drop table _tmp_table2;
+
+create table rescan_sort_cleanup_foo (a int, b int);
+create table rescan_sort_cleanup_bar (c int, d int);
+insert into rescan_sort_cleanup_foo values (1, 1), (1, 2);
+insert into rescan_sort_cleanup_bar values (1, 1);
+
+select gp_inject_fault('execrescansort', 'finish_pending', 2);
+select *, (select row_number() over (order by c) from rescan_sort_cleanup_bar where d = a) from rescan_sort_cleanup_foo;
+select gp_inject_fault('execrescansort', 'reset', 2);

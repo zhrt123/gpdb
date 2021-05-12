@@ -273,6 +273,8 @@ FaultInjectorIdentifierEnumToString[] = {
 		/* inject fault in ExecSort before doing the actual sort */
 	_("execsort_mksort_mergeruns"),
 		/* inject fault in MKSort during the mergeruns phase */
+	_("execrescansort"),
+		/* inject fault at the end of ExecReScanSort */
 	_("execshare_input_next"),
 		/* inject fault after shared input scan retrieved a tuple */
 	_("base_backup_post_create_checkpoint"),
@@ -1230,6 +1232,7 @@ FaultInjector_NewHashEntry(
 		case WorkfileHashJoinFailure:
 		case UpdateCommittedEofInPersistentTable:
 		case ExecSortBeforeSorting:
+		case ExecReScanSortEndOfFunc:
 		case FaultDuringExecDynamicTableScan:
 		case FaultExecHashJoinNewBatch:
 		case RunawayCleanup:

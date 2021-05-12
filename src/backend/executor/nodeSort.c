@@ -590,11 +590,13 @@ ExecReScanSort(SortState *node, ExprContext *exprCtxt)
 		if (gp_enable_mk_sort && NULL != node->tuplesortstate->sortstore_mk)
 		{
 			tuplesort_end_mk(node->tuplesortstate->sortstore_mk);
+			node->tuplesortstate->sortstore_mk = NULL;
 		}
 
 		if (!gp_enable_mk_sort && NULL != node->tuplesortstate->sortstore)
 		{
 			tuplesort_end(node->tuplesortstate->sortstore);
+			node->tuplesortstate->sortstore = NULL;
 		}
 
 		/*
@@ -617,6 +619,8 @@ ExecReScanSort(SortState *node, ExprContext *exprCtxt)
 			tuplesort_rescan(node->tuplesortstate->sortstore);
 		}
 	}
+
+    SIMPLE_FAULT_INJECTOR(ExecReScanSortEndOfFunc);
 }
 
 
