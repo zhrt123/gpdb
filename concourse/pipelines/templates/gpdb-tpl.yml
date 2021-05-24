@@ -420,13 +420,6 @@ resources:
   type: s3
 
 {% endif %}
-- name: aix_environments
-  type: pool
-  source:
-    uri: {{concourse-resource-pools-git-remote}}
-    branch: master
-    pool: client_loader_remote_aix
-    private_key: {{concourse-resource-pools-git-key}}
 
 - name: gpdb_src
   type: git
