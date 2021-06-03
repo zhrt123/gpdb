@@ -419,6 +419,20 @@ class PSQLError(Exception):
     '''
     pass
 
+Modify_Output_Case = [40]
+
+def alterOutFile(num,old_str,new_str):
+    file = 'query'+str(num)+'.out'
+    with open(file, "r") as f1:
+        with open("%s.bak" % file, "w") as f2:
+            for line in f1:
+                for i in range(len(old_str)):
+                    line = re.sub(old_str[i],new_str[i],line)
+                f2.write(line)
+    os.remove(file)
+    os.rename("%s.bak" % file, file)
+
+
 class GPLoad_FormatOpts_TestCase(unittest.TestCase):
 
     def check_result(self,ifile, optionalFlags = "", outputPath = ""):
@@ -449,6 +463,12 @@ class GPLoad_FormatOpts_TestCase(unittest.TestCase):
         modify_sql_file(num)
         file = mkpath('query%d.sql' % num)
         runfile(file)
+        if num in Modify_Output_Case :
+            pat1 = r'["|//]\d+\.\d+\.\d+\.\d+'  # host ip 
+            newpat1 = lambda x : x.group(0)[0]+'*'
+            pat2 = r'[a-zA-Z0-9/\_-]*/data_file'  # file location
+            newpat2 = 'pathto/data_file'
+            alterOutFile(num, [pat1,pat2], [newpat1,newpat2])
         self.check_result(file)
 
     def test_00_gpload_formatOpts_setup(self):
