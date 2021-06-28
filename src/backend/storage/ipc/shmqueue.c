@@ -88,9 +88,6 @@ SHMQueueDelete(SHM_QUEUE *queue)
 	nextElem->prev = (queue)->prev;
 
 	(queue)->prev = (queue)->next = INVALID_OFFSET;
-
-	Assert(prevElem->next != INVALID_OFFSET);
-	Assert(nextElem->prev != INVALID_OFFSET);
 }
 
 /*
