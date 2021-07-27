@@ -402,6 +402,12 @@ find_usable_indexes(PlannerInfo *root, RelOptInfo *rel,
 		if (index_is_ordered && possibly_useful_pathkeys &&
 			istoplevel && outer_rel == NULL)
 		{
+			/*
+			 * index_pathkeys might be NULL when target index does not provide
+			 * a desired sort order in query or when useful for sorting
+			 * index corresponding to inherited or child relation does not
+			 * participate in join.
+			 */
 			index_pathkeys = build_index_pathkeys(root, index,
 												  ForwardScanDirection);
 
@@ -410,7 +416,7 @@ find_usable_indexes(PlannerInfo *root, RelOptInfo *rel,
 			 * of the child's baserel.  Transform the pathkey list to refer to
 			 * columns of the appendrel.
 			 */
-			if (rel->reloptkind == RELOPT_OTHER_MEMBER_REL)
+			if (index_pathkeys && rel->reloptkind == RELOPT_OTHER_MEMBER_REL)
 			{
 				AppendRelInfo *appinfo = NULL;
 				RelOptInfo *appendrel = NULL;
