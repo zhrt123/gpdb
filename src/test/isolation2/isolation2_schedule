@@ -85,7 +85,6 @@ test: distributed_snapshot
 test: gp_collation
 test: ao_upgrade
 test: bitmap_update_words_backup_block
-test: bitmap_index_crash
 # below test utilizes fault injectors so it needs to be in a group by itself
 test: external_table
 
