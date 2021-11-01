@@ -15,11 +15,7 @@ test_pg_get_nameinfo_all_unix(bool log_hostname)
 
 	/* initialize UNIX socket parameters */
 	addr->ss_family = AF_UNIX;
-#if defined(__darwin__)
-	strcpy(addr->__ss_pad1, "mock");
-#else
-	strcpy(addr->__ss_padding, "mock");
-#endif
+	strcpy(((struct sockaddr_un *)addr)->sun_path, "mock");
 
 	/* This code is pretty much duplicated from postmaster.c:BackendInitialize() */
 	result = pg_getnameinfo_all(addr, salen,
