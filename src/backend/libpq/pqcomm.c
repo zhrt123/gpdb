@@ -1166,6 +1166,18 @@ pq_getstring(StringInfo s)
 	}
 }
 
+/* --------------------------------
+ *		pq_buffer_has_data		- is any buffered data available to read?
+ *
+ * This will *not* attempt to read more data.
+ * --------------------------------
+ */
+bool
+pq_buffer_has_data(void)
+{
+	return (PqRecvPointer < PqRecvLength);
+}
+
 
 /* --------------------------------
  *		pq_getmessage	- get a message with length word from connection
