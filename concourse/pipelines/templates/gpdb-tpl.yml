@@ -2452,8 +2452,12 @@ jobs:
           output_mapping:
             cluster_env_files: cluster_2
     - task: exchange_keys
-      image: alpine-docker
       config:
+        image_resource:
+          type: registry-image
+          source:
+            repository: centos
+            tag: 7
         platform: linux
         inputs:
           - name: cluster_1
@@ -2463,8 +2467,7 @@ jobs:
           args:
             - -exc
             - |
-              apk add --update --no-progress openssh-client
-
+              yum install --quiet -y openssh-clients
               opts="-o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no -i cluster_1/private_key.pem"
               while read -r ip host extra; do
                   scp $opts cluster_2/.ssh/*private_key.pem gpadmin@"$ip":~/.ssh/
