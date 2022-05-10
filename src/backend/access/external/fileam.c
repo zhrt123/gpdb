@@ -2515,6 +2515,11 @@ external_set_env_vars_ext(extvar_t *extvar, char *uri, bool csv, char *escape, c
 		extvar->GP_USER = "";
 
 	extvar->GP_DATABASE = get_database_name(MyDatabaseId);
+	if (extvar->GP_DATABASE == NULL)
+		ereport(ERROR,
+				(errcode_for_file_access(),
+				 errmsg("cannot get database name, id: %d", MyDatabaseId)));
+
 	extvar->GP_SEG_PG_CONF = ConfigFileName;	/* location of the segments
 												 * pg_conf file  */
 	extvar->GP_SEG_DATADIR = data_directory;	/* location of the segments
