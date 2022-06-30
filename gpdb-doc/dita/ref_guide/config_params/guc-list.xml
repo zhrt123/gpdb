@@ -4638,7 +4638,7 @@
             <row>
               <entry colname="col1">UDPIFC<p>TCP</p></entry>
               <entry colname="col2">UDPIFC</entry>
-              <entry colname="col3">local<p>system</p><p>restart</p></entry>
+              <entry colname="col3">local<p>session</p><p>reload</p></entry>
             </row>
           </tbody>
         </tgroup>
