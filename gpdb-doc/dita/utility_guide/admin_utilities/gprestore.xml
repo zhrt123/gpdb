@@ -9,28 +9,28 @@
       on segment hosts in CSV data files.</p>
     <section>
       <title>Synopsis</title>
-      <codeblock><b>gprestore --timestamp</b> <varname>YYYYMMDDHHMMSS</varname>
-   [<b>--backup-dir</b> <varname>directory</varname>]
-   [<b>--create-db</b>]
-   [<b>--debug</b>]
-   [<b>--exclude-schema</b> <varname>schema_name</varname>]
-   [<b>--exclude-table</b> <varname>schema.table</varname>]
-   [<b>--exclude-table-file</b> <varname>file_name</varname>]
-   [<b>--include-schema</b> <varname>schema_name</varname>]
-   [<b>--include-table</b> <varname>schema.table</varname>]
-   [<b>--include-table-file</b> <varname>file_name</varname>]
-   [<b>--data-only</b> | <b>--metadata-only</b>]
-   [<b>--jobs</b> <varname>int</varname>]
-   [<b>--on-error-continue</b>]
-   [<b>--plugin-config</b> <varname>config_file_location</varname>]
-   [<b>--quiet</b>]
-   [<b>--redirect-db</b> <varname>database_name</varname>]
-   [<b>--verbose</b>]
-   [<b>--version</b>]
-   [<b>--with-globals</b>]
-   [<b>--with-stats</b>]
+      <codeblock>gprestore --timestamp &lt;YYYYMMDDHHMMSS>
+   [--backup-dir &lt;directory>]
+   [--create-db]
+   [--debug]
+   [--exclude-schema &lt;schema_name>]
+   [--exclude-table &lt;schema.table>]
+   [--exclude-table-file &lt;file_name>]
+   [--include-schema &lt;schema_name>]
+   [--include-table &lt;schema.table>]
+   [--include-table-file &lt;file_name>]
+   [--data-only | --metadata-only]
+   [--jobs &lt;int>]
+   [--on-error-continue]
+   [--plugin-config &lt;config_file_location>]
+   [--quiet]
+   [--redirect-db &lt;database_name>]
+   [--verbose]
+   [--version]
+   [--with-globals]
+   [--with-stats]
 
-<b>gprestore --help</b></codeblock>
+gprestore --help</codeblock>
     </section>
     <section>
       <title>Description</title>
@@ -131,8 +131,8 @@
             created with the <codeph>gpbackup</codeph> option <codeph>--metadata-only</codeph> does
             not contain table data.</pd>
           <pd>To restore only database tables, without restoring the table data, see the option
-                <codeph><xref href="#topic1/metadata_only" format="dita"
-              >--metadata-only</xref></codeph>.</pd>
+                <xref href="#topic1/metadata_only" format="dita"
+              >--metadata-only</xref>.</pd>
         </plentry>
         <plentry>
           <pt><b>--debug</b></pt>
@@ -250,8 +250,8 @@
             created with the <codeph>gpbackup</codeph> option <codeph>--data-only</codeph> does not
             contain the DDL for tables. </pd>
           <pd>To restore table data after you create the database tables, see the option
-                <codeph><xref href="#topic1/data_only" format="dita"
-            >--data-only</xref></codeph>.</pd>
+                <xref href="#topic1/data_only" format="dita"
+            >--data-only</xref>.</pd>
         </plentry>
         <plentry>
           <pt><b>--on-error-continue</b></pt>
@@ -356,7 +356,7 @@ $ gprestore --include-schema wikipedia --backup-dir /home/gpadmin/backups/ --tim
     <section id="section9">
       <title>See Also</title>
       <p>
-        <codeph><xref href="./gpbackup.xml" type="topic" format="dita"/></codeph>, <xref
+        <xref href="./gpbackup.xml" type="topic" format="dita"/>, <xref
           href="../../admin_guide/managing/backup-gpbackup.xml" format="dita"/> and <xref
           href="../../admin_guide/managing/backup-s3-plugin.xml"/></p>
     </section>

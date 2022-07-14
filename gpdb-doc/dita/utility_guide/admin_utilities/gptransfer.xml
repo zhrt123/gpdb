@@ -11,40 +11,40 @@
         <note conref="../../admin_guide/managing/gptransfer.xml#topic_gptransfer/note1"/>
         <section id="section2">
             <title>Synopsis</title>
-            <codeblock><b>gptransfer</b>
-   { <b>--full </b>|
-   { [<b>-d</b> <varname>database1</varname> [ <b>-d</b> <varname>database2</varname> ... ]] |
-   [<b>-t</b> <varname>db</varname>.<varname>schema</varname>.<varname>table</varname> [ <b>-t</b> <varname>db</varname>.<varname>schema1</varname>.<varname>table1</varname> ... ]] |
-   [<b>-f</b> <varname>table-file</varname> [<b>--partition-transfer</b>
-     | <b>--partition-transfer-non-partition-target</b> ]]
-   [<b>-T</b> <varname>db</varname>.<varname>schema</varname>.<varname>table</varname> [ <b>-T</b> <varname>db</varname>.<varname>schema1</varname>.<varname>table1</varname> ... ]]
-   [<b>-F</b> <varname>table-file</varname>] } }
-   [<b>--skip-existing</b> | <b>--truncate</b> | <b>--drop</b>]
-   [<b>--analyze</b>] [<b>--validate</b>=<varname>type</varname>] [<b>-x</b>] [<b>--dry-run</b>]
-   [<b>--schema-only</b> ]
-   [<b>--source-host</b>=<varname>source_host</varname> [<b>--source-port</b>=<varname>source_port</varname>]
-   [<b>--source-user</b>=<varname>source_user</varname>]]
-   [<b>--base-port</b>=<varname>base_gpfdist_port</varname>]
-   [<b>--dest-host</b>=<varname>dest_host</varname> <b>--source-map-file</b>=<varname>host_map_file</varname>
-   [<b>--dest-port</b>=<varname>port</varname>] [<b>--dest-user</b>=<varname>dest_user</varname>] ]
-   [<b>--dest-database</b>=<varname>dest_database_name</varname>]
-   [<b>--batch-size</b>=<varname>batch_size</varname>] [<b>--sub-batch-size</b>=<varname>sub_batch_size</varname>]
-   [<b>--timeout</b>=<varname>seconds</varname>]
-   [<b>--max-line-length</b>=<varname>length</varname>]
-   [<b>--work-base-dir</b>=<varname>work_dir</varname>] [<b>-l</b> <varname>log_dir</varname>]
-   [<b>--format</b>=[<b>CSV</b>|<b>TEXT</b>] ]
-   [<b>--quote</b>=<varname>character</varname> ]
-   [<b>--no-final-count</b> ]
+            <codeblock>gptransfer
+   { --full |
+   { [-d &lt;database1> [ -d &lt;database2> ... ]] |
+   [-t &lt;db>.&lt;schema>.&lt;table> [ -t &lt;db>.&lt;schema1>.&lt;table1> ... ]] |
+   [-f &lt;table-file> [--partition-transfer
+     | --partition-transfer-non-partition-target ]]
+   [-T &lt;db>.&lt;schema>.&lt;table> [ -T &lt;db>.&lt;schema1>.&lt;table1> ... ]]
+   [-F &lt;table-file>] } }
+   [--skip-existing | --truncate | --drop]
+   [--analyze] [--validate=&lt;type>] [-x] [--dry-run]
+   [--schema-only ]
+   [--source-host=&lt;source_host> [--source-port=&lt;source_port>]
+   [--source-user=&lt;source_user>]]
+   [--base-port=&lt;base_gpfdist_port>]
+   [--dest-host=&lt;dest_host> --source-map-file=&lt;host_map_file>
+   [--dest-port=&lt;port>] [--dest-user=&lt;dest_user>] ]
+   [--dest-database=&lt;dest_database_name>]
+   [--batch-size=&lt;batch_size>] [--sub-batch-size=&lt;sub_batch_size>]
+   [--timeout=&lt;seconds>]
+   [--max-line-length=&lt;length>]
+   [--work-base-dir=&lt;work_dir>] [-l &lt;log_dir>]
+   [--format=[CSV|TEXT] ]
+   [--quote=&lt;character> ]
+   [--no-final-count ]
 
-   [<b>-v</b> | <b>--verbose</b>]
-   [<b>-q</b> | <b>--quiet</b>]
-   [<b>--gpfdist-verbose</b>]
-   [<b>--gpfdist-very-verbose</b>]
-   [<b>-a</b>]
+   [-v | --verbose]
+   [-q | --quiet]
+   [--gpfdist-verbose]
+   [--gpfdist-very-verbose]
+   [-a]
 
-<b>gptransfer --version</b>
+gptransfer --version
 
-<b>gptransfer</b> <b>-h</b> | <b>-?</b> | <b>--help</b></codeblock>
+gptransfer -h | -? | --help</codeblock>
         </section>
         <section id="section3">
             <title>Description</title>
@@ -381,7 +381,7 @@
                                         <codeph>-f</codeph> option contains a list of fully
                                     qualified leaf child partition table names with this syntax. </pd>
                                 <pd>
-                                    <codeblock><varname>src_db</varname>.<varname>src_schema</varname>.<varname>src_prt_tbl</varname>[, <varname>dst_db</varname>.<varname>dst_schema</varname>.<varname>dst_prt_tbl</varname>]</codeblock>
+                                    <codeblock>&lt;src_db>.&lt;src_schema>.&lt;src_prt_tbl>[, &lt;dst_db>.&lt;dst_schema>.&lt;dst_prt_tbl>]</codeblock>
                                 </pd>
                                 <pd>Wildcard characters are not supported in the fully qualified
                                     table names. The destination partitioned table must exist. If
@@ -436,7 +436,7 @@
                                     option contains a list of fully qualified leaf child partition
                                     table names in the source database and non-partitioned tables
                                     names in the destination database with this syntax.
-                                    <codeblock><varname>src_db</varname>.<varname>src_schema</varname>.<varname>src_part_tbl</varname>, <varname>dest_db</varname>.<varname>dest_schema</varname>.<varname>dest_tbl</varname></codeblock></pd>
+                                    <codeblock>&lt;src_db>.&lt;src_schema>.&lt;src_part_tbl>, &lt;dest_db>.&lt;dest_schema>.&lt;dest_tbl></codeblock></pd>
                                 <pd>Wildcard characters are not supported in the fully qualified
                                     table names. The destination tables must exist, and both source
                                     and destination table names are required in the file. </pd>
@@ -876,7 +876,7 @@ sdw4,192.0.2.4</codeblock>
         <section id="section8">
             <title>See Also</title>
             <p>
-                <codeph><xref href="gpfdist.xml#topic1">gpfdist</xref></codeph>
+                <xref href="gpfdist.xml#topic1">gpfdist</xref>
             </p>
             <p>For information about loading and unloading data, see the <i>Greenplum Database
                     Administrator Guide</i>.</p>

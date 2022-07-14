@@ -7,13 +7,13 @@
     <p id="sql_command_desc">Defines a new table from the results of a query.</p>
     <section id="section2">
       <title>Synopsis</title>
-      <codeblock id="sql_command_synopsis">CREATE [ [GLOBAL | LOCAL] {TEMPORARY | TEMP} ] TABLE <varname>table_name</varname>
-   [(<varname>column_name</varname> [, ...] )]
-   [ WITH ( <varname>storage_parameter</varname>=<varname>value</varname> [, ... ] ) ]
+      <codeblock id="sql_command_synopsis">CREATE [ [GLOBAL | LOCAL] {TEMPORARY | TEMP} ] TABLE &lt;table_name>
+   [(&lt;column_name> [, ...] )]
+   [ WITH ( &lt;storage_parameter>=&lt;value> [, ... ] ) ]
    [ON COMMIT {PRESERVE ROWS | DELETE ROWS | DROP}]
-   [TABLESPACE <varname>tablespace</varname>]
-   AS <varname>query</varname>
-   [DISTRIBUTED BY (<varname>column</varname>, [ ... ] ) | DISTRIBUTED RANDOMLY]</codeblock>
+   [TABLESPACE &lt;tablespace>]
+   AS &lt;query>
+   [DISTRIBUTED BY (&lt;column>, [ ... ] ) | DISTRIBUTED RANDOMLY]</codeblock>
       <p>where <varname>storage_parameter</varname> is:</p>
       <codeblock>   APPENDONLY={TRUE|FALSE}
    BLOCKSIZE={8192-2097152}
@@ -26,7 +26,7 @@
     <section id="section3">
       <title>Description</title>
       <p><codeph>CREATE TABLE AS</codeph> creates a table and fills it with data computed by a
-            <codeph><xref href="./SELECT.xml#topic1" type="topic" format="dita"/></codeph> command.
+            <xref href="./SELECT.xml#topic1" type="topic" format="dita"/> command.
         The table columns have the names and data types associated with the output columns of the
           <codeph>SELECT</codeph>, however you can override the column names by giving an explicit
         list of new column names. </p>
@@ -91,8 +91,8 @@
             between 1 (fastest compression) to 9 (highest compression ratio). QuickLZ compression
             level can only be set to 1. If not declared, the default is 1. This option is only valid
             if <codeph>APPENDONLY=TRUE</codeph>.</pd>
-          <pd>FILLFACTOR — See <codeph><xref href="CREATE_INDEX.xml#topic1" type="topic"
-                format="dita"/></codeph> for more information about this index storage parameter. </pd>
+          <pd>FILLFACTOR — See <xref href="CREATE_INDEX.xml#topic1" type="topic"
+                format="dita"/> for more information about this index storage parameter. </pd>
           <pd>OIDS — Set to <codeph>OIDS=FALSE</codeph> (the default) so that rows do not have
             object identifiers assigned to them. Greenplum strongly recommends that you do not
             enable OIDS when creating a table. On large tables, such as those in a typical Greenplum
@@ -122,10 +122,10 @@
         </plentry>
         <plentry>
           <pt>AS <varname>query</varname></pt>
-          <pd>A <codeph><xref href="./SELECT.xml#topic1" type="topic" format="dita"/></codeph> or
-                <codeph><xref href="./VALUES.xml#topic1" type="topic" format="dita"/></codeph>
-            command, or an <codeph><xref href="./EXECUTE.xml#topic1" type="topic" format="dita"
-              /></codeph> command that runs a prepared <codeph>SELECT</codeph> or <codeph>VALUES
+          <pd>A <xref href="./SELECT.xml#topic1" type="topic" format="dita"/> or
+                <xref href="./VALUES.xml#topic1" type="topic" format="dita"/>
+            command, or an <xref href="./EXECUTE.xml#topic1" type="topic" format="dita"
+              /> command that runs a prepared <codeph>SELECT</codeph> or <codeph>VALUES
             </codeph>query.</pd>
         </plentry>
         <plentry>
@@ -158,14 +158,14 @@
     </section>
     <section id="section5">
       <title>Notes</title>
-      <p>This command is functionally similar to <codeph><xref href="./SELECT_INTO.xml#topic1"
-            type="topic" format="dita"/></codeph>, but it is preferred since it is less likely to be
+      <p>This command is functionally similar to <xref href="./SELECT_INTO.xml#topic1"
+            type="topic" format="dita"/>, but it is preferred since it is less likely to be
         confused with other uses of the <codeph>SELECT INTO</codeph> syntax. Furthermore,
           <codeph>CREATE TABLE AS</codeph> offers a superset of the functionality offered by
           <codeph>SELECT INTO</codeph>. </p>
       <p><codeph>CREATE TABLE AS</codeph> can be used for fast data loading from external table data
-        sources. See <codeph><xref href="CREATE_EXTERNAL_TABLE.xml#topic1" type="topic"
-            format="dita"/></codeph>.</p>
+        sources. See <xref href="CREATE_EXTERNAL_TABLE.xml#topic1" type="topic"
+            format="dita"/>.</p>
     </section>
     <section id="section6">
       <title>Examples</title>
@@ -202,13 +202,13 @@ EXECUTE recentfilms('2007-01-01');</codeblock>
     </section>
     <section id="section8">
       <title>See Also</title>
-      <p><codeph><xref href="CREATE_EXTERNAL_TABLE.xml#topic1" type="topic" format="dita"
-        /></codeph>, <codeph><xref href="CREATE_EXTERNAL_TABLE.xml#topic1" type="topic"
-            format="dita"/></codeph>, <codeph><xref href="./EXECUTE.xml#topic1" type="topic"
-            format="dita"/></codeph>, <codeph><xref href="./SELECT.xml#topic1" type="topic"
-            format="dita"/></codeph>, <codeph><xref href="./SELECT_INTO.xml#topic1" type="topic"
-            format="dita"/></codeph>, <codeph><xref href="./VALUES.xml#topic1" type="topic"
-            format="dita"/></codeph></p>
+      <p><xref href="CREATE_EXTERNAL_TABLE.xml#topic1" type="topic" format="dita"
+        />, <xref href="CREATE_EXTERNAL_TABLE.xml#topic1" type="topic"
+            format="dita"/>, <xref href="./EXECUTE.xml#topic1" type="topic"
+            format="dita"/>, <xref href="./SELECT.xml#topic1" type="topic"
+            format="dita"/>, <xref href="./SELECT_INTO.xml#topic1" type="topic"
+            format="dita"/>, <xref href="./VALUES.xml#topic1" type="topic"
+            format="dita"/></p>
     </section>
   </body>
 </topic>

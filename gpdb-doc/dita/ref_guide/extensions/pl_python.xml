@@ -32,8 +32,8 @@
       <p>PL/Python is a loadable procedural language. With the Greenplum Database PL/Python
         extension, you can write a Greenplum Database user-defined functions in Python that take
         advantage of Python features and modules to quickly build robust database applications. </p>
-      <p>You can run PL/Python code blocks as anonymous code blocks. See the <codeph><xref
-            href="../sql_commands/DO.xml#topic1">DO</xref></codeph> command in the <cite>Greenplum
+      <p>You can run PL/Python code blocks as anonymous code blocks. See the <xref
+            href="../sql_commands/DO.xml#topic1">DO</xref> command in the <cite>Greenplum
           Database Reference Guide</cite>.</p>
       <p>The Greenplum Database PL/Python extension is installed by default with Greenplum Database.
         Greenplum Database installs a version of Python and PL/Python. This is location of the
@@ -423,7 +423,7 @@ $$;</codeblock>
       <codeblock>which python</codeblock>
       <p>The command returns the location of the Python installation. The Python installed with
         Greenplum Database is in the Greenplum Database <codeph>ext/python</codeph> directory.</p>
-      <codeblock>/<varname>path_to_greenplum-db</varname>/ext/python/bin/python</codeblock>
+      <codeblock>/&lt;path_to_greenplum-db>/ext/python/bin/python</codeblock>
       <p>When running shell commands on remote hosts with <codeph>gpssh</codeph>, you can specify
         the <codeph>-s</codeph> option. When the option is specified, <codeph>gpssh</codeph> sources
         the <codeph>greenplum_path.sh</codeph> file before running commands on the remote hosts. For
@@ -560,7 +560,7 @@ $$ language plpythonu;</codeblock>
             <codeph>gp_segment_configuration</codeph> contains information about mirroring and
           segment configuration. This command returns the host name for a segment ID.</p>
         <codeblock>SELECT hostname, content AS seg_ID FROM gp_segment_configuration
-  WHERE content = <varname>seg_id</varname> ;</codeblock>
+  WHERE content = &lt;seg_id> ;</codeblock>
         <p>If <codeph>FAILURE</codeph> is returned, these are some possible causes:</p>
         <ul id="ul_kx1_rwq_wt">
           <li>A problem accessing required libraries. For the NumPy example, a Greenplum Database

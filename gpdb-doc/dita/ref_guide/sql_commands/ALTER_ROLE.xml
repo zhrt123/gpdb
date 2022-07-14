@@ -7,35 +7,35 @@
     <p id="sql_command_desc">Changes a database role (user or group).</p>
     <section id="section2">
       <title>Synopsis</title>
-      <codeblock id="sql_command_synopsis">ALTER ROLE <varname>name</varname> RENAME TO <varname>newname</varname>
+      <codeblock id="sql_command_synopsis">ALTER ROLE &lt;name> RENAME TO &lt;newname>
 
-ALTER ROLE <varname>name</varname> SET <varname>config_parameter</varname> {TO | =} {<varname>value</varname> | DEFAULT}
+ALTER ROLE &lt;name> SET &lt;config_parameter> {TO | =} {&lt;value> | DEFAULT}
 
-ALTER ROLE <varname>name</varname> RESET <varname>config_parameter</varname>
+ALTER ROLE &lt;name> RESET &lt;config_parameter>
 
-ALTER ROLE <varname>name</varname> RESOURCE QUEUE {<varname>queue_name</varname> | NONE}
+ALTER ROLE &lt;name> RESOURCE QUEUE {&lt;queue_name> | NONE}
 
-ALTER ROLE <varname>name</varname> RESOURCE GROUP {<varname>group_name</varname> | NONE}
+ALTER ROLE &lt;name> RESOURCE GROUP {&lt;group_name> | NONE}
 
-ALTER ROLE <varname>name</varname> [ [WITH] <varname>option</varname> [ ... ] ]</codeblock>
+ALTER ROLE &lt;name> [ [WITH] &lt;option> [ ... ] ]</codeblock>
       <p>where <varname>option</varname> can be:</p>
       <codeblock>      SUPERUSER | NOSUPERUSER
     | CREATEDB | NOCREATEDB
     | CREATEROLE | NOCREATEROLE
     | CREATEUSER | NOCREATEUSER
     | CREATEEXTTABLE | NOCREATEEXTTABLE 
-      [ ( <varname>attribute</varname>='<varname>value</varname>'[, ...] ) ]
-           where <varname>attributes</varname> and <varname>value</varname> are:
+      [ ( &lt;attribute>='&lt;value>'[, ...] ) ]
+           where &lt;attributes> and &lt;value> are:
            type='readable'|'writable'
            protocol='gpfdist'|'http'
     | INHERIT | NOINHERIT
     | LOGIN | NOLOGIN
-    | CONNECTION LIMIT <varname>connlimit</varname>
-    | [ENCRYPTED | UNENCRYPTED] PASSWORD '<varname>password</varname>'
-    | VALID UNTIL '<varname>timestamp</varname>'
-    | [ DENY <varname>deny_point</varname> ]
-    | [ DENY BETWEEN <varname>deny_point</varname> AND <varname>deny_point</varname>]
-    | [ DROP DENY FOR <varname>deny_point</varname> ]</codeblock>
+    | CONNECTION LIMIT &lt;connlimit>
+    | [ENCRYPTED | UNENCRYPTED] PASSWORD '&lt;password>'
+    | VALID UNTIL '&lt;timestamp>'
+    | [ DENY &lt;deny_point> ]
+    | [ DENY BETWEEN &lt;deny_point> AND &lt;deny_point>]
+    | [ DROP DENY FOR &lt;deny_point> ]</codeblock>
     </section>
     <section id="section3">
       <title>Description</title>
@@ -60,18 +60,18 @@ ALTER ROLE <varname>name</varname> [ [WITH] <varname>option</varname> [ ... ] ]<
           queue. The role would then be subject to the limits assigned to the resource queue when
           issuing queries. Specify <codeph>NONE</codeph> to assign the role to the default resource
           queue. A role can only belong to one resource queue. For a role without
-            <codeph>LOGIN</codeph> privilege, resource queues have no effect. See <codeph><xref
-              href="./CREATE_RESOURCE_QUEUE.xml#topic1" type="topic" format="dita"/></codeph> for
+            <codeph>LOGIN</codeph> privilege, resource queues have no effect. See <xref
+              href="./CREATE_RESOURCE_QUEUE.xml#topic1" type="topic" format="dita"/> for
           more information.</li>
         <li id="av1370583"><b>RESOURCE GROUP</b> — Assigns a resource group to the role. The role
           would then be subject to the concurrent transaction, memory, and CPU limits configured for
           the resource group. You can assign a single resource group to one or more roles. You
           cannot assign a resource group that you create for an external component to a role. See
-              <codeph><xref href="./CREATE_RESOURCE_GROUP.xml#topic1" type="topic" format="dita"
-            /></codeph> for additional information.  </li>
+              <xref href="./CREATE_RESOURCE_GROUP.xml#topic1" type="topic" format="dita"
+            /> for additional information.  </li>
         <li id="av137061"><b>WITH <varname>option</varname></b> — Changes many of the role
-          attributes that can be specified in <codeph><xref href="./CREATE_ROLE.xml#topic1"
-              type="topic" format="dita"/></codeph>. Attributes not mentioned in the command retain
+          attributes that can be specified in <xref href="./CREATE_ROLE.xml#topic1"
+              type="topic" format="dita"/>. Attributes not mentioned in the command retain
           their previous settings. Database superusers can change any of these settings for any
           role. Roles having <codeph>CREATEROLE</codeph> privilege can change any of these settings,
           but only for non-superuser roles. Ordinary roles can only change their own password.</li>
@@ -94,8 +94,8 @@ ALTER ROLE <varname>name</varname> [ [WITH] <varname>option</varname> [ ... ] ]<
             value. If value is <codeph>DEFAULT</codeph> or if <codeph>RESET</codeph> is used, the
             role-specific variable setting is removed, so the role will inherit the system-wide
             default setting in new sessions. Use <codeph>RESET ALL</codeph> to clear all
-            role-specific settings. See <codeph><xref href="./SET.xml#topic1" type="topic"
-                format="dita"/></codeph> and <xref href="../config_params/guc_config.xml"
+            role-specific settings. See <xref href="./SET.xml#topic1" type="topic"
+                format="dita"/> and <xref href="../config_params/guc_config.xml"
               type="topic" format="dita"/> for information about user-settable configuration
             parameters. </pd>
         </plentry>
@@ -142,8 +142,8 @@ ALTER ROLE <varname>name</varname> [ [WITH] <varname>option</varname> [ ... ] ]<
           <pt>PASSWORD password</pt>
           <pt>ENCRYPTED | UNENCRYPTED</pt>
           <pt>VALID UNTIL 'timestamp'</pt>
-          <pd>These clauses alter role attributes originally set by <codeph><xref
-                href="./CREATE_ROLE.xml#topic1" type="topic" format="dita"/></codeph>. </pd>
+          <pd>These clauses alter role attributes originally set by <xref
+                href="./CREATE_ROLE.xml#topic1" type="topic" format="dita"/>. </pd>
         </plentry>
         <plentry>
           <pt>DENY deny_point</pt>
@@ -161,7 +161,7 @@ ALTER ROLE <varname>name</varname> [ [WITH] <varname>option</varname> [ ... ] ]<
           <pd>The <codeph>DENY BETWEEN</codeph> clause uses two <varname>deny_point</varname>
             parameters.</pd>
           <pd>
-            <codeblock>DENY BETWEEN <varname>deny_point</varname> AND <varname>deny_point</varname></codeblock>
+            <codeblock>DENY BETWEEN &lt;deny_point> AND &lt;deny_point></codeblock>
           </pd>
           <pd>For more information about time-based constraints and examples, see "Managing Roles
             and Privileges" in the <i>Greenplum Database Administrator Guide</i>.</pd>
@@ -177,8 +177,8 @@ ALTER ROLE <varname>name</varname> [ [WITH] <varname>option</varname> [ ... ] ]<
     </section>
     <section id="section5">
       <title>Notes</title>
-      <p>Use <codeph><xref href="./GRANT.xml#topic1" type="topic" format="dita"/></codeph> and
-            <codeph><xref href="./REVOKE.xml#topic1" type="topic" format="dita"/></codeph> for
+      <p>Use <xref href="./GRANT.xml#topic1" type="topic" format="dita"/> and
+            <xref href="./REVOKE.xml#topic1" type="topic" format="dita"/> for
         adding and removing role memberships.</p>
       <p>Caution must be exercised when specifying an unencrypted password with this command. The
         password will be transmitted to the server in clear text, and it might also be logged in the
@@ -187,8 +187,8 @@ ALTER ROLE <varname>name</varname> [ [WITH] <varname>option</varname> [ ... ] ]<
         role's password. </p>
       <p>It is also possible to tie a session default to a specific database rather than to a role.
         Role-specific settings override database-specific ones if there is a conflict. See
-            <codeph><xref href="ALTER_DATABASE.xml#topic1" type="topic" format="dita"
-        /></codeph>.</p>
+            <xref href="ALTER_DATABASE.xml#topic1" type="topic" format="dita"
+        />.</p>
     </section>
     <section id="section6">
       <title>Examples</title>
@@ -219,14 +219,14 @@ ALTER ROLE <varname>name</varname> [ [WITH] <varname>option</varname> [ ... ] ]<
     </section>
     <section id="section8">
       <title>See Also</title>
-      <p><codeph><xref href="./CREATE_ROLE.xml#topic1" type="topic" format="dita"/></codeph>,
-            <codeph><xref href="./DROP_ROLE.xml#topic1" type="topic" format="dita"/></codeph>,
-            <codeph><xref href="./SET.xml#topic1" type="topic" format="dita"/></codeph>,
-            <codeph><xref href="./CREATE_RESOURCE_GROUP.xml#topic1" type="topic" format="dita"
-          /></codeph>, <codeph><xref href="./CREATE_RESOURCE_QUEUE.xml#topic1" type="topic"
-            format="dita"/></codeph>, <codeph><xref href="./GRANT.xml#topic1" type="topic"
-            format="dita"/></codeph>, <codeph><xref href="./REVOKE.xml#topic1" type="topic"
-            format="dita"/></codeph></p>
+      <p><xref href="./CREATE_ROLE.xml#topic1" type="topic" format="dita"/>,
+            <xref href="./DROP_ROLE.xml#topic1" type="topic" format="dita"/>,
+            <xref href="./SET.xml#topic1" type="topic" format="dita"/>,
+            <xref href="./CREATE_RESOURCE_GROUP.xml#topic1" type="topic" format="dita"
+          />, <xref href="./CREATE_RESOURCE_QUEUE.xml#topic1" type="topic"
+            format="dita"/>, <xref href="./GRANT.xml#topic1" type="topic"
+            format="dita"/>, <xref href="./REVOKE.xml#topic1" type="topic"
+            format="dita"/></p>
     </section>
   </body>
 </topic>

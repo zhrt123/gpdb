@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE topic
   PUBLIC "-//OASIS//DTD DITA Composite//EN" "ditabase.dtd">
-<topic id="topic1"><title id="dx20941">PREPARE</title><body><p id="sql_command_desc">Prepare a statement for execution.</p><section id="section2"><title>Synopsis</title><codeblock id="sql_command_synopsis">PREPARE <varname>name</varname> [ (<varname>datatype</varname> [, ...] ) ] AS <varname>statement</varname></codeblock></section><section id="section3"><title>Description</title><p><codeph>PREPARE</codeph> creates a prepared statement, possibly with
+<topic id="topic1"><title id="dx20941">PREPARE</title><body><p id="sql_command_desc">Prepare a statement for execution.</p><section id="section2"><title>Synopsis</title><codeblock id="sql_command_synopsis">PREPARE &lt;name> [ (&lt;datatype> [, ...] ) ] AS &lt;statement></codeblock></section><section id="section3"><title>Description</title><p><codeph>PREPARE</codeph> creates a prepared statement, possibly with
 unbound parameters. A prepared statement is a server-side object that
 can be used to optimize performance. A prepared statement may be subsequently
 executed with a binding for its parameters. Greenplum Database may choose
@@ -17,8 +17,8 @@ for these parameters in the <codeph>EXECUTE</codeph> statement.</p><p>Prepared s
         ends, the prepared statement is forgotten, so it must be recreated before being used again.
         This also means that a single prepared statement cannot be used by multiple simultaneous
         database clients; however, each client can create their own prepared statement to use. The
-        prepared statement can be manually cleaned up using the <codeph><xref
-            href="DEALLOCATE.xml#topic1" type="topic" format="dita"/></codeph> command. </p><p>Prepared statements have the largest performance advantage when a
+        prepared statement can be manually cleaned up using the <xref
+            href="DEALLOCATE.xml#topic1" type="topic" format="dita"/> command. </p><p>Prepared statements have the largest performance advantage when a
 single session is being used to execute a large number of similar statements.
 The performance difference will be particularly significant if the statements
 are complex to plan or rewrite, for example, if the query involves a
@@ -56,5 +56,5 @@ is used:</p><codeblock>PREPARE usrrptplan (int) AS SELECT * FROM users u, logs l
 WHERE u.usrid=$1 AND u.usrid=l.usrid AND l.date = $2;
 EXECUTE usrrptplan(1, current_date);</codeblock></section><section id="section7"><title>Compatibility</title><p>The SQL standard includes a <codeph>PREPARE</codeph> statement, but
 it is only for use in embedded SQL. This version of the <codeph>PREPARE</codeph>
-statement also uses a somewhat different syntax.</p></section><section id="section8"><title>See Also</title><p><codeph><xref href="EXECUTE.xml#topic1" type="topic" format="dita"/></codeph>, <codeph><xref
-            href="DEALLOCATE.xml#topic1" type="topic" format="dita"/></codeph></p></section></body></topic>
+statement also uses a somewhat different syntax.</p></section><section id="section8"><title>See Also</title><p><xref href="EXECUTE.xml#topic1" type="topic" format="dita"/>, <xref
+            href="DEALLOCATE.xml#topic1" type="topic" format="dita"/></p></section></body></topic>

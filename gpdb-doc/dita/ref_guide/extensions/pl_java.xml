@@ -220,7 +220,7 @@
           <li id="pv160918">Install the software extension package by running the
               <codeph>gppkg</codeph> command. This example installs the PL/Java extension package on
             a Linux
-            system:<codeblock>$ gppkg -i pljava-1.4.3-gp5-rhel<varname>osversion</varname>-x86_64.gppkg</codeblock></li>
+            system:<codeblock>$ gppkg -i pljava-1.4.3-gp5-rhel&lt;osversion>-x86_64.gppkg</codeblock></li>
           <li>Ensure that the environment variables <codeph>JAVA_HOME</codeph> and
               <codeph>LD_LIBRARY_PATH</codeph> are set properly in
               <codeph>$GPHOME/greenplum_path.sh</codeph> on all Greenplum Database hosts.<ul
@@ -237,7 +237,7 @@
                   <codeph>libjvm.so</codeph> is available in
                   <codeph>$JAVA_HOME/jre/lib/amd64/server</codeph>. This example adds the directory to
                 the environment
-                variable.<codeblock>LD_LIBRARY_PATH=$GPHOME/lib:$GPHOME/ext/python/lib:<b>$JAVA_HOME/jre/lib/amd64/server</b>:$LD_LIBRARY_PATH</codeblock></li>
+                variable.<codeblock>LD_LIBRARY_PATH=$GPHOME/lib:$GPHOME/ext/python/lib:$JAVA_HOME/jre/lib/amd64/server:$LD_LIBRARY_PATH</codeblock></li>
             </ul>This example <codeph>gpscp</codeph> command copies the file to all hosts specified
             in the file
             <codeph>gphosts_file</codeph>.<codeblock>$ gpscp -f gphosts_file $GPHOME/greenplum_path.sh 

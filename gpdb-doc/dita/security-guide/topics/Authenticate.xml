@@ -275,16 +275,16 @@ hostssl all all 0.0.0.0/0   krb5 map=krbmap
 </codeblock></p>
         <p>The following Kerberos server settings are specified in <codeph>postgresql.conf</codeph>: <parml>
             <plentry>
-              <pt><codeph>krb_server_key <i>file</i></codeph></pt>
+              <pt>krb_server_key <i>file</i></pt>
               <pd>Sets the location of the Kerberos server key file.</pd>
             </plentry>
             <plentry>
               <pt>
-                <codeph>krb_srvname <i>string</i></codeph></pt>
+                krb_srvname <i>string</i></pt>
               <pd>Kerberos service name.</pd>
             </plentry>
             <plentry>
-              <pt><codeph>krb_caseins_users <i>boolean</i></codeph></pt>
+              <pt>krb_caseins_users <i>boolean</i></pt>
               <pd>Case-sensitivity. The default is off. </pd>
             </plentry>
           </parml></p>
@@ -607,7 +607,7 @@ host     &lt;user-name>     &lt;db-name>     &lt;address>     pam     pamservice
         </parml>
       </section>
       <p>Following are sample <codeph>pg_hba.conf</codeph> entries for RADIUS client
-        authentication:<codeblock>hostssl  all all 0.0.0.0/0 radius radiusserver=servername radiussecret=<varname>sharedsecret</varname></codeblock></p>
+        authentication:<codeblock>hostssl  all all 0.0.0.0/0 radius radiusserver=servername radiussecret=&lt;sharedsecret></codeblock></p>
     </body>
   </topic>
   <topic id="topic_hwn_bk2_jr">

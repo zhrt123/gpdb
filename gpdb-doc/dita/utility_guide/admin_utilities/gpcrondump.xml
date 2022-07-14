@@ -4,52 +4,52 @@
   <title id="kp142557">gpcrondump</title>
   <body>
     <p>Writes out a database to SQL script files. The script files can be used to restore the
-      database using the <codeph><xref href="./gpdbrestore.xml#topic1" type="topic" format="dita"
-        /></codeph> utility. The <codeph>gpcrondump</codeph> utility can be called directly or from
+      database using the <xref href="./gpdbrestore.xml#topic1" type="topic" format="dita"
+        /> utility. The <codeph>gpcrondump</codeph> utility can be called directly or from
       a <codeph>crontab</codeph> entry.</p>
     <note>This utility is deprecated and will not be supported after the end of Greenplum Database
       5.x Support Life.</note>
     <section id="section2">
       <title>Synopsis</title>
-      <codeblock><b>gpcrondump</b> <b>-x</b> <varname>database_name</varname> 
-   [<b>-s</b> <varname>schema</varname> | <b>-S</b> <varname>schema</varname> | <b>-t</b> <varname>schema.table</varname> | <b>-T</b> <varname>schema.table</varname>] 
-   [<b>--table-file</b>=<varname>filename</varname> | <b>--exclude-table-file</b>=<varname>filename</varname>] 
-   [<b>--schema-file</b>=<varname>filename</varname> | <b>--exclude-schema-file</b>=<varname>filename</varname>]
-   [<b>--dump-stats</b>] 
-   [<b>-u</b> <varname>backup_directory</varname>] [<b>-R</b> <varname>post_dump_script</varname>] [<b>--incremental</b>] 
-   [<b>-K</b> <varname>timestamp</varname> [<b>--list-backup-files</b>] ]
-   [<b>--prefix</b> <varname>prefix_string</varname> [<b>--list-filter-tables</b>]
-   [<b>-c</b> [<b>--cleanup-date</b> <varname>yyyymmdd</varname> | <b>--cleanup-total</b> <varname>n</varname>] ]
-   [<b>-z</b>] [<b>-r</b>] 
-   [<b>-f</b> <varname>free_space_percent</varname>] [<b>-b</b>] [<b>-h</b>] [<b>-H</b>] [<b>-j</b> | <b>-k</b>] [<b>-g</b>] [<b>-G</b>] [<b>-C</b>] 
-   [<b>-d</b> <varname>master_data_directory</varname>] [<b>-B</b> <varname>parallel_processes</varname>] [<b>-a</b>] [<b>-q</b>]
-   [<b>-y</b> <varname>reportfile</varname>] [<b>-l</b> <varname>logfile_directory</varname>]
-   [<b>--email-file</b> <varname>path_to_file</varname>] [<b>-v</b>]
-   { [<b>-E</b> <varname>encoding</varname>] [<b>--inserts</b> | <b>--column-inserts</b>] [<b>--oids</b>] 
-     [<b>--no-owner</b> | <b>--use-set-session-authorization</b>] [<b>--no-privileges</b>] 
-     [<b>--rsyncable</b>]
-     { [<b>--ddboost</b> [<b>--replicate --max-streams</b> <varname>max_IO_streams</varname>]
-     [<b>--ddboost-skip-ping</b>] [<b>--ddboost-storage-unit</b>=<varname>unit-ID</varname>]] } | 
-     { [<b>--netbackup-service-host</b> <varname>netbackup_server</varname>
-     <b>--netbackup-policy</b> <varname>netbackup_policy</varname>
-     <b>--netbackup-schedule</b> <varname>netbackup_schedule</varname> [<b>--netbackup-block-size</b> <varname>size</varname>] ]
-     [<b>--netbackup-keyword</b> <varname>keyword</varname>] ] } }
+      <codeblock>gpcrondump -x &lt;database_name> 
+   [-s &lt;schema> | -S &lt;schema> | -t &lt;schema.table> | -T &lt;schema.table>] 
+   [--table-file=&lt;filename> | --exclude-table-file=&lt;filename>] 
+   [--schema-file=&lt;filename> | --exclude-schema-file=&lt;filename>]
+   [--dump-stats] 
+   [-u &lt;backup_directory>] [-R &lt;post_dump_script>] [--incremental] 
+   [-K &lt;timestamp> [--list-backup-files] ]
+   [--prefix &lt;prefix_string> [--list-filter-tables]
+   [-c [--cleanup-date &lt;yyyymmdd> | --cleanup-total &lt;n>] ]
+   [-z] [-r] 
+   [-f &lt;free_space_percent>] [-b] [-h] [-H] [-j | -k] [-g] [-G] [-C] 
+   [-d &lt;master_data_directory>] [-B &lt;parallel_processes>] [-a] [-q]
+   [-y &lt;reportfile>] [-l &lt;logfile_directory>]
+   [--email-file &lt;path_to_file>] [-v]
+   { [-E &lt;encoding>] [--inserts | --column-inserts] [--oids] 
+     [--no-owner | --use-set-session-authorization] [--no-privileges] 
+     [--rsyncable]
+     { [--ddboost [--replicate --max-streams &lt;max_IO_streams>]
+     [--ddboost-skip-ping] [--ddboost-storage-unit=&lt;unit-ID>]] } | 
+     { [--netbackup-service-host &lt;netbackup_server>
+     --netbackup-policy &lt;netbackup_policy>
+     --netbackup-schedule &lt;netbackup_schedule> [--netbackup-block-size &lt;size>] ]
+     [--netbackup-keyword &lt;keyword>] ] } }
 
-<b>gpcrondump</b> <b>--ddboost-host</b> <varname>ddboost_hostname</varname>
-   [<b>--ddboost-host</b> <varname>ddboost_hostname</varname> ... ]
-   <b>--ddboost-user</b> <varname>ddboost_user</varname> <b>--ddboost-backupdir</b> <varname>backup_directory</varname> 
-   [<b>--ddboost-remote]</b> [<b>--ddboost-skip-ping</b>]
-   [<b>--ddboost-storage-unit</b>=<varname>unit-ID</varname>] 
+gpcrondump --ddboost-host &lt;ddboost_hostname>
+   [--ddboost-host &lt;ddboost_hostname> ... ]
+   --ddboost-user &lt;ddboost_user> --ddboost-backupdir &lt;backup_directory> 
+   [--ddboost-remote] [--ddboost-skip-ping]
+   [--ddboost-storage-unit=&lt;unit-ID>] 
 
-<b>gpcrondump</b> <b>--ddboost-show-config</b> [<b>--remote</b>]
+gpcrondump --ddboost-show-config [--remote]
 
-<b>gpcrondump</b> <b>--ddboost-config-remove</b>
+gpcrondump --ddboost-config-remove
 
-<b>gpcrondump</b> <b>-o</b> [<b>--cleanup-date</b> <varname>yyyymmdd</varname> | <b>--cleanup-total</b> <varname>n</varname>] 
+gpcrondump -o [--cleanup-date &lt;yyyymmdd> | --cleanup-total &lt;n>] 
 
-<b>gpcrondump</b> <b>-?</b> 
+gpcrondump -? 
 
-<b>gpcrondump</b> <b>--version</b></codeblock>
+gpcrondump --version</codeblock>
     </section>
     <section id="section3">
       <title>Description</title>
@@ -107,7 +107,7 @@
     <section>
       <title>Backup Filenames</title>
       <p>The utility creates backup files with this file name format.</p>
-      <p><codeblock><varname>prefix_</varname>gp_dump_<varname>content</varname>_<varname>dbid</varname>_<varname>timestamp</varname></codeblock>The
+      <p><codeblock>&lt;prefix_>gp_dump_&lt;content>_&lt;dbid>_&lt;timestamp></codeblock>The
           <codeph>content</codeph> and <codeph>dbid</codeph> are identifiers for the Greenplum
         Database segment instances that are assigned by Greenplum Database. For information about
         the identifiers, see the Greenplum Database system catalog table
@@ -812,9 +812,9 @@ gp_dump_20130514093000_regular_files</codeblock>
       <codeblock>
 EMAIL_DETAILS:
     -
-        DBNAME: <varname>database_name</varname>
-        FROM: <varname>from_user</varname>
-        SUBJECT: <varname>subject_text</varname>
+        DBNAME: &lt;database_name>
+        FROM: &lt;from_user>
+        SUBJECT: &lt;subject_text>
 </codeblock>
       <p>When email notification is configured for gpcrondump, the <varname>from_user</varname> and
         the <varname>subject_text</varname> are the strings that <codeph>gpcrondump</codeph> uses in
@@ -876,9 +876,7 @@ EMAIL_DETAILS:
     <section id="section9">
       <title>See Also</title>
       <p>
-        <codeph>
           <xref href="./gpdbrestore.xml#topic1" type="topic" format="dita"/>
-        </codeph>
       </p>
     </section>
   </body>
