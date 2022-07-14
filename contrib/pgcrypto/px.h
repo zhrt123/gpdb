@@ -196,7 +196,8 @@ const char *px_resolve_alias(const PX_Alias *aliases, const char *name);
 void		px_set_debug_handler(void (*handler) (const char *));
 void		px_memset(void *ptr, int c, size_t len);
 
-void		px_memset(void *ptr, int c, size_t len);
+void		px_enable_fipsmode(void);
+void		px_disable_fipsmode(void);
 
 #ifdef PX_DEBUG
 void
