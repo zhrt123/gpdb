@@ -41,7 +41,9 @@
 #include <openssl/err.h>
 
 #ifdef OPENSSL_FIPS
+#if __has_include("openssl/fips.h")
 #include <openssl/fips.h>
+#endif
 #endif
 
 #include "utils/memutils.h"
