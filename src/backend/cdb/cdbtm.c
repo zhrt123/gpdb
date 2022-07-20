@@ -1201,10 +1201,29 @@ bool
 currentDtxDispatchProtocolCommand(DtxProtocolCommand dtxProtocolCommand, bool raiseError)
 {
 	char gid[TMGIDSIZE];
+	List *dtxSegments = NIL;
+	bool ret;
 
 	dtxFormGid(gid, getDistributedTransactionId());
-	return doDispatchDtxProtocolCommand(dtxProtocolCommand, gid, raiseError,
-										MyTmGxactLocal->dtxSegments, NULL, 0);
+
+  	/*
+  	 * Skip prepare phase for read only segments.
+  	 * For other dtx command, such as commit and abort, we must put readOnlySegments into
+  	 * dispatch list, to ensure all segments in this transaction are completed.
+  	 */
+	if (dtxProtocolCommand == DTX_PROTOCOL_COMMAND_PREPARE)
+	{
+		return doDispatchDtxProtocolCommand(dtxProtocolCommand, gid, raiseError, MyTmGxactLocal->dtxSegments, NULL, 0);
+	}
+	else
+	{
+		dtxSegments = list_concat_unique_int(dtxSegments, MyTmGxactLocal->dtxSegments);
+		dtxSegments = list_concat_unique_int(dtxSegments, MyTmGxactLocal->readOnlySegments);
+		ret = doDispatchDtxProtocolCommand(dtxProtocolCommand, gid, raiseError, dtxSegments, NULL, 0);
+		if (dtxSegments != NIL)
+			list_free(dtxSegments);
+		return ret;
+	}
 }
 
 bool
@@ -2215,7 +2234,14 @@ performDtxProtocolCommand(DtxProtocolCommand dtxProtocolCommand,
 					break;
 			}
 			break;
-
+		
+		/*
+		 * The prepared write operation and the read-only operation will be committed together
+		 * in the transaction combined with one-phase commits and two-phase commits. When the 
+		 * transaction aborts, the write operation will abort by performDtxProtocolAbortPrepared(),
+		 * and read-only operation will abort by AbortOutOfAnyTransaction(). 
+		 */
+		case DTX_PROTOCOL_COMMAND_ABORT_PREPARED:
 		case DTX_PROTOCOL_COMMAND_ABORT_SOME_PREPARED:
 			switch (DistributedTransactionContext)
 			{
@@ -2257,18 +2283,28 @@ performDtxProtocolCommand(DtxProtocolCommand dtxProtocolCommand,
 			}
 			break;
 
+		/*
+		 * The prepared write operation and the read-only operation will be committed together
+		 * in the transaction combined with one-phase commits and two-phase commits. We should execute 
+		 * performDtxProtocolCommitOnePhase() and performDtxProtocolCommitPrepared() respectively.
+		 */
 		case DTX_PROTOCOL_COMMAND_COMMIT_PREPARED:
-			requireDistributedTransactionContext(DTX_CONTEXT_QE_PREPARED);
-			setDistributedTransactionContext(DTX_CONTEXT_QE_FINISH_PREPARED);
-			performDtxProtocolCommitPrepared(gid, /* raiseErrorIfNotFound */ true);
+			switch (DistributedTransactionContext)
+			{
+				case DTX_CONTEXT_QE_TWO_PHASE_EXPLICIT_WRITER:
+				case DTX_CONTEXT_QE_TWO_PHASE_IMPLICIT_WRITER:
+					performDtxProtocolCommitOnePhase(gid);
+					break;
+				case DTX_CONTEXT_QE_PREPARED:
+					setDistributedTransactionContext(DTX_CONTEXT_QE_FINISH_PREPARED);
+					performDtxProtocolCommitPrepared(gid, /* raiseErrorIfNotFound */ true);
+					break;
+				default:
+					elog(PANIC, "Unexpected segment distribute transaction context value: %d",
+						 (int) DistributedTransactionContext);
+					break;
+			}
 			break;
-
-		case DTX_PROTOCOL_COMMAND_ABORT_PREPARED:
-			requireDistributedTransactionContext(DTX_CONTEXT_QE_PREPARED);
-			setDistributedTransactionContext(DTX_CONTEXT_QE_FINISH_PREPARED);
-			performDtxProtocolAbortPrepared(gid, /* raiseErrorIfNotFound */ true);
-			break;
-
 		case DTX_PROTOCOL_COMMAND_RETRY_COMMIT_PREPARED:
 			requireDistributedTransactionContext(DTX_CONTEXT_LOCAL_ONLY);
 			performDtxProtocolCommitPrepared(gid, /* raiseErrorIfNotFound */ false);
