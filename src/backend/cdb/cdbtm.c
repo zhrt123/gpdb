@@ -512,7 +512,7 @@ doNotifyingOnePhaseCommit(void)
 {
 	bool		succeeded;
 
-	if (MyTmGxactLocal->dtxSegments == NIL)
+	if (MyTmGxactLocal->dtxSegments == NIL && MyTmGxactLocal->readOnlySegments == NIL)
 		return;
 
 	elog(DTM_DEBUG5, "doNotifyingOnePhaseCommit entering in state = %s", DtxStateToString(MyTmGxactLocal->state));
@@ -918,7 +918,7 @@ rollbackDtxTransaction(void)
 		case DTX_STATE_ACTIVE_DISTRIBUTED:
 		case DTX_STATE_ONE_PHASE_COMMIT:
 		case DTX_STATE_NOTIFYING_ONE_PHASE_COMMIT:
-			if (!MyTmGxactLocal->dtxSegments || currentGxactWriterGangLost())
+			if ((!MyTmGxactLocal->dtxSegments && !MyTmGxactLocal->readOnlySegments) || currentGxactWriterGangLost())
 			{
 				ereport(DTM_DEBUG5,
 						(errmsg("The distributed transaction 'Abort' broadcast was omitted (segworker group already dead)"),
@@ -1435,6 +1435,8 @@ resetTmGxact(void)
 	MyTmGxactLocal->writerGangLost = false;
 	MyTmGxactLocal->dtxSegmentsMap = NULL;
 	MyTmGxactLocal->dtxSegments = NIL;
+	MyTmGxactLocal->readOnlySegmentsMap = NULL;
+	MyTmGxactLocal->readOnlySegments = NIL;
 	MyTmGxactLocal->isOnePhaseCommit = false;
 	if (MyTmGxactLocal->waitGxids != NULL)
 	{
@@ -2371,15 +2373,46 @@ currentGxactWriterGangLost(void)
 }
 
 /*
- * Record which segment involved in the two phase commit.
+ * Add read only segments into MyTmGxactLocal->readOnlySegments.
  */
 void
-addToGxactDtxSegments(Gang *gang)
+addToReadOnlySegments(int segindex)
 {
-	SegmentDatabaseDescriptor *segdbDesc;
 	MemoryContext oldContext;
-	int segindex;
-	int i;
+
+	if (!isCurrentDtxActivated())
+		return;
+
+	/* skip if all segdbs are in the list */
+	if (list_length(MyTmGxactLocal->readOnlySegments) >= getgpsegmentCount())
+		return;
+
+	/* entry db is just a reader, will not involve in two phase commit */
+	if (segindex == -1)
+		return;
+
+	/* skip if record already */
+	if (bms_is_member(segindex, MyTmGxactLocal->readOnlySegmentsMap) || 
+		bms_is_member(segindex, MyTmGxactLocal->dtxSegmentsMap))
+		return;
+
+	oldContext = MemoryContextSwitchTo(TopTransactionContext);
+
+	MyTmGxactLocal->readOnlySegmentsMap = bms_add_member(MyTmGxactLocal->readOnlySegmentsMap, segindex);
+	MyTmGxactLocal->readOnlySegments = lappend_int(MyTmGxactLocal->readOnlySegments, segindex);
+	
+	MemoryContextSwitchTo(oldContext);
+}
+
+/*
+ * Record which segment involved in the two phase commit.
+ * If one segment exists in readOnlySegments, we should move
+ * it from readOnlySegments to dtxSegments.
+ */
+void
+addToGxactDtxSegments(int segindex)
+{
+	MemoryContext oldContext;
 
 	if (!isCurrentDtxActivated())
 		return;
@@ -2388,27 +2421,31 @@ addToGxactDtxSegments(Gang *gang)
 	if (list_length(MyTmGxactLocal->dtxSegments) >= getgpsegmentCount())
 		return;
 
+	/* entry db is just a reader, will not involve in two phase commit */
+	if (segindex == -1)
+		return;
+
+	/* skip if record already */
+	if (bms_is_member(segindex, MyTmGxactLocal->dtxSegmentsMap))
+		return;
+	
 	oldContext = MemoryContextSwitchTo(TopTransactionContext);
-	for (i = 0; i < gang->size; i++)
+
+	MyTmGxactLocal->dtxSegmentsMap = bms_add_member(MyTmGxactLocal->dtxSegmentsMap, segindex);
+	MyTmGxactLocal->dtxSegments = lappend_int(MyTmGxactLocal->dtxSegments, segindex);
+
+	if (bms_is_member(segindex, MyTmGxactLocal->readOnlySegmentsMap))
 	{
-		segdbDesc = gang->db_descriptors[i];
-		Assert(segdbDesc);
-		segindex = segdbDesc->segindex;
+		MyTmGxactLocal->readOnlySegments = list_delete_int(MyTmGxactLocal->readOnlySegments, segindex);
+		MyTmGxactLocal->readOnlySegmentsMap = bms_del_member(MyTmGxactLocal->readOnlySegmentsMap, segindex);
 
-		/* entry db is just a reader, will not involve in two phase commit */
-		if (segindex == -1)
-			continue;
-
-		/* skip if record already */
-		if (bms_is_member(segindex, MyTmGxactLocal->dtxSegmentsMap))
-			continue;
-
-		MyTmGxactLocal->dtxSegmentsMap =
-			bms_add_member(MyTmGxactLocal->dtxSegmentsMap, segindex);
-
-		MyTmGxactLocal->dtxSegments =
-			lappend_int(MyTmGxactLocal->dtxSegments, segindex);
+		/* 
+		 * We do not need to free MyTmGxactLocal->readOnlySegmentsMap when 
+		 * list_length(MyTmGxactLocal->readOnlySegments) = 0, which could be used
+		 *  in addToGxactDtxSegments(). 
+		 */
 	}
+	
 	MemoryContextSwitchTo(oldContext);
 }
 

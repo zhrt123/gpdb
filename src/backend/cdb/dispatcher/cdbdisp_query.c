@@ -347,12 +347,7 @@ CdbDispatchSetCommand(const char *strCommand, bool cancelOnError)
 
 		cdbdisp_dispatchToGang(ds, rg, -1);
 	}
-	addToGxactDtxSegments(primaryGang);
 
-	/*
-	 * No need for two-phase commit, so no need to call
-	 * addToGxactDtxSegments.
-	 */
 
 	cdbdisp_waitDispatchFinish(ds);
 
@@ -512,8 +507,6 @@ cdbdisp_dispatchCommandInternal(DispatchCommandQueryParms *pQueryParms,
 
 	cdbdisp_dispatchToGang(ds, primaryGang, -1);
 
-	if ((flags & DF_NEED_TWO_PHASE) != 0 || isDtxExplicitBegin())
-		addToGxactDtxSegments(primaryGang);
 
 	cdbdisp_waitDispatchFinish(ds);
 
@@ -1195,8 +1188,6 @@ cdbdisp_dispatchX(QueryDesc* queryDesc,
 		SIMPLE_FAULT_INJECTOR("before_one_slice_dispatched");
 
 		cdbdisp_dispatchToGang(ds, primaryGang, si);
-		if (planRequiresTxn || isDtxExplicitBegin())
-			addToGxactDtxSegments(primaryGang);
 
 		SIMPLE_FAULT_INJECTOR("after_one_slice_dispatched");
 	}
@@ -1367,8 +1358,6 @@ CdbDispatchCopyStart(struct CdbCopy *cdbCopy, Node *stmt, int flags)
 	cdbdisp_makeDispatchParams (ds, 1, queryText, queryTextLength);
 
 	cdbdisp_dispatchToGang(ds, primaryGang, -1);
-	if ((flags & DF_NEED_TWO_PHASE) != 0 || isDtxExplicitBegin())
-		addToGxactDtxSegments(primaryGang);
 
 	cdbdisp_waitDispatchFinish(ds);
 
