@@ -864,9 +864,8 @@ prepareDtxTransaction(void)
 	}
 
 	/*
-	 * If only one segment was involved in the transaction, and no local XID
-	 * has been assigned on the QD either, or there is no xlog writing related
-	 * to this transaction on all segments, we can perform one-phase commit.
+	 * If the number of xlog writing segments related to this transaction is less than two, 
+	 * and no local XID has been assigned on the QD either, we can perform one-phase commit.
 	 * Otherwise, broadcast PREPARE TRANSACTION to the segments.
 	 */
 	if (!TopXactExecutorDidWriteXLog() ||
@@ -1202,9 +1201,12 @@ currentDtxDispatchProtocolCommand(DtxProtocolCommand dtxProtocolCommand, bool ra
 {
 	char gid[TMGIDSIZE];
 	List *dtxSegments = NIL;
+	ListCell *lc;
 	bool ret;
 
 	dtxFormGid(gid, getDistributedTransactionId());
+
+	dtxSegments = list_copy(MyTmGxactLocal->dtxSegments);
 
   	/*
   	 * Skip prepare phase for read only segments.
@@ -1213,17 +1215,21 @@ currentDtxDispatchProtocolCommand(DtxProtocolCommand dtxProtocolCommand, bool ra
   	 */
 	if (dtxProtocolCommand == DTX_PROTOCOL_COMMAND_PREPARE)
 	{
-		return doDispatchDtxProtocolCommand(dtxProtocolCommand, gid, raiseError, MyTmGxactLocal->dtxSegments, NULL, 0);
+		ret = doDispatchDtxProtocolCommand(dtxProtocolCommand, gid, raiseError, dtxSegments, NULL, 0);
 	}
 	else
 	{
-		dtxSegments = list_concat_unique_int(dtxSegments, MyTmGxactLocal->dtxSegments);
-		dtxSegments = list_concat_unique_int(dtxSegments, MyTmGxactLocal->readOnlySegments);
+		foreach(lc, MyTmGxactLocal->readOnlySegments)
+		{
+			dtxSegments = lappend_int(dtxSegments, lfirst_int(lc));
+		}
 		ret = doDispatchDtxProtocolCommand(dtxProtocolCommand, gid, raiseError, dtxSegments, NULL, 0);
-		if (dtxSegments != NIL)
-			list_free(dtxSegments);
-		return ret;
 	}
+
+	if (dtxSegments != NIL)
+		list_free(dtxSegments);
+		
+	return ret;
 }
 
 bool
@@ -2420,11 +2426,11 @@ addToReadOnlySegments(int segindex)
 		return;
 
 	/* skip if all segdbs are in the list */
-	if (list_length(MyTmGxactLocal->readOnlySegments) >= getgpsegmentCount())
+	if (list_length(MyTmGxactLocal->dtxSegments) + list_length(MyTmGxactLocal->readOnlySegments) >= getgpsegmentCount())
 		return;
 
 	/* entry db is just a reader, will not involve in two phase commit */
-	if (segindex == -1)
+	if (segindex < 0)
 		return;
 
 	/* skip if record already */
@@ -2458,7 +2464,7 @@ addToGxactDtxSegments(int segindex)
 		return;
 
 	/* entry db is just a reader, will not involve in two phase commit */
-	if (segindex == -1)
+	if (segindex < 0)
 		return;
 
 	/* skip if record already */
