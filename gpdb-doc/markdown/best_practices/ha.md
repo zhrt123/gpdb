@@ -138,7 +138,7 @@ You can configure a Greenplum Database system to trigger SNMP \(Simple Network M
 -   [gprecoverseg](../utility_guide/admin_utilities/gprecoverseg.html) - recover a failed segment
 -   [gpactivatestandby](../utility_guide/admin_utilities/gpactivatestandby.html) - make the standby master the active master
 
-[RDBMS MIB Specification](http://tools.ietf.org/html/rfc1697)
+[RDBMS MIB Specification](https://datatracker.ietf.org/doc/html/rfc1697)
 
 ## Segment Mirroring Configurations 
 
