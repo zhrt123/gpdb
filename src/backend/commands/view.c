@@ -110,6 +110,7 @@ DefineVirtualRelation(const RangeVar *relation, List *tlist, bool replace)
 	Oid			viewOid,
 				namespaceId;
 	CreateStmt *createStmt = makeNode(CreateStmt);
+	ObjectAddress address;
 	List	   *attrList;
 	ListCell   *t;
 

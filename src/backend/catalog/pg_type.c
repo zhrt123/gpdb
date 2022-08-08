@@ -493,7 +493,14 @@ TypeCreate(Oid newTypeOid,
  *
  * If rebuild is true, we remove existing dependencies and rebuild them
  * from scratch.  This is needed for ALTER TYPE, and also when replacing
+<<<<<<< HEAD
  * a shell type.
+=======
+ * a shell type.  We don't remove an existing extension dependency, though.
+ * That means an extension can't absorb a shell type that is free-standing
+ * or belongs to another extension, nor ALTER a type that is free-standing or
+ * belongs to another extension.
+>>>>>>> d0fa119a387 (In extensions, don't replace objects not belonging to the extension.)
  */
 void
 GenerateTypeDependencies(Oid typeNamespace,

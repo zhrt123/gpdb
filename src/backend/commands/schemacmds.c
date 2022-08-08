@@ -57,6 +57,7 @@ CreateSchemaCommand(CreateSchemaStmt *stmt, const char *queryString)
 	Oid			saved_uid;
 	int			save_sec_context;
 	AclResult	aclresult;
+	ObjectAddress address;
 	bool		shouldDispatch = (Gp_role == GP_ROLE_DISPATCH && 
 								  !IsBootstrapProcessingMode());
 
