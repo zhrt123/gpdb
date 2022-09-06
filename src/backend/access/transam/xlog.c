@@ -9083,13 +9083,46 @@ CreateCheckPoint(int flags)
 
 	prepared_transaction_agg_state *p = NULL;
 
+	/*
+	 * Note the master mirror checkpoint (mmxlog) and prepared transaction
+	 * aggregate state (ptas) will be skipped when gp_before_filespace_setup
+	 * is ON. See comments inside UnpackCheckPointRecord(). For the case,
+	 * mmxlog_append_checkpoint_data() will return earlier.
+	 *
+	 * Note that we need to collect ptas data even when we don't need to write
+	 * it to check point xlog record.
+	 * When gp_before_filespace_setup is ON, we will not link mmxlog and ptas
+	 * to rdata. However, we still need ptas data to calculate oldest prepared
+	 * transaction XLogRecPtr (ptrd_oldest) and offset of deleting old log
+	 * files. See the code related to ptrd_oldest/ptrd_oldest_ptr/_logId/
+	 * _logSeg.
+	 */
 	getTwoPhasePreparedTransactionData(&p, "CreateCheckPoint");
 	elog(PersistentRecovery_DebugPrintLevel(), "CreateCheckPoint: prepared transactions = %d", p->count);
-	*pnext = &rdata[5];
-	rdata[5].data = (char*)p;
-	rdata[5].buffer = InvalidBuffer;
-	rdata[5].len = PREPARED_TRANSACTION_CHECKPOINT_BYTES(p->count);
-	rdata[5].next = NULL;
+
+	/*
+	 * The pointer pnext is supposed to advance inside
+	 * mmxlog_append_checkpoint_data(). If pnext == &rdata[1].next after the
+	 * calling, it means pnext did not advance due to returning earlier, and
+	 * the rdata chain stops here. If not, go ahead, collect ptas data and
+	 * link to rdata[5].
+	 */
+	if (pnext != &rdata[1].next)
+	{
+		/*
+		 * If pnext has advanced, gp_before_filespace_setup must be false,
+		 * and pnext must point to rdata[4].next.
+		 */
+		Assert(!gp_before_filespace_setup);
+		Assert(pnext == &rdata[4].next);
+
+		*pnext = &rdata[5];
+		rdata[5].data = (char*)p;
+		rdata[5].buffer = InvalidBuffer;
+		rdata[5].len = PREPARED_TRANSACTION_CHECKPOINT_BYTES(p->count);
+		rdata[5].next = NULL;
+	}
+
 	/*
 	 * Save the data pointers that need to be pfreed after XLogInsert.
 	 * This is essential because rdata[x].data may be changed in XLogInsert.
