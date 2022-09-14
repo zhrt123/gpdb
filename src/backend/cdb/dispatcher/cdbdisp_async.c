@@ -1093,6 +1093,8 @@ processResults(CdbDispatchResult *dispatchResult)
 		{
 			MarkTopTransactionWriteXLogOnExecutor();
 
+			addToGxactDtxSegments(segdbDesc->segindex);
+
 			/*
 			 * Reset the worte_xlog here. Since if the received pgresult not process
 			 * the xlog write message('x' message sends from QE in ReadyForQuery),
@@ -1100,6 +1102,10 @@ processResults(CdbDispatchResult *dispatchResult)
 			 * always mark current top transaction has wrote xlog on executor.
 			 */
 			segdbDesc->conn->wrote_xlog = false;
+		}
+		else
+		{
+			addToReadOnlySegments(segdbDesc->segindex);
 		}
 
 		/*
