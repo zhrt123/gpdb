@@ -1221,9 +1221,10 @@ currentDtxDispatchProtocolCommand(DtxProtocolCommand dtxProtocolCommand, bool ra
 {
 	char gid[TMGIDSIZE];
 	List *dtxSegs = NIL;
+	ListCell *lc;
 	bool result = false;
 
-	dtxSegs = list_concat_unique_int(dtxSegs, MyTmGxactLocal->dtxSegments);
+	dtxSegs = list_copy(MyTmGxactLocal->dtxSegments);
 	dtxFormGid(gid, getDistributedTransactionId());
 
 	if (Test_print_direct_dispatch_info)
@@ -1244,8 +1245,13 @@ currentDtxDispatchProtocolCommand(DtxProtocolCommand dtxProtocolCommand, bool ra
 		result = doDispatchDtxProtocolCommand(dtxProtocolCommand, gid, raiseError,
 										  	  dtxSegs, NULL, 0);
 	else
-		result = doDispatchDtxProtocolCommand(dtxProtocolCommand, gid, raiseError,
-										  	  list_concat_unique_int(dtxSegs, MyTmGxactLocal->readOnlySegments), NULL, 0);
+	{
+		foreach(lc, MyTmGxactLocal->readOnlySegments)
+		{
+			dtxSegs = lappend_int(dtxSegs, lfirst_int(lc));
+		}
+		result = doDispatchDtxProtocolCommand(dtxProtocolCommand, gid, raiseError, dtxSegs, NULL, 0);
+	}
 
 	if (dtxSegs != NIL)
 		pfree(dtxSegs);
@@ -2440,6 +2446,7 @@ addToGxactDtxSegments(int segindex)
 	if (!isCurrentDtxActivated())
 		return;
 
+	/* entry db is just a reader, will not involve in two phase commit */
 	if (segindex < 0)
 		return;
 
@@ -2447,14 +2454,11 @@ addToGxactDtxSegments(int segindex)
 	if (list_length(MyTmGxactLocal->dtxSegments) >= getgpsegmentCount())
 		return;
 
-	oldContext = MemoryContextSwitchTo(TopTransactionContext);
-
 	/* skip if record already */
 	if (bms_is_member(segindex, MyTmGxactLocal->dtxSegmentsMap))
-	{
-		MemoryContextSwitchTo(oldContext);
 		return;
-	}
+
+	oldContext = MemoryContextSwitchTo(TopTransactionContext);
 
 	MyTmGxactLocal->dtxSegmentsMap =
 		bms_add_member(MyTmGxactLocal->dtxSegmentsMap, segindex);
@@ -2465,18 +2469,15 @@ addToGxactDtxSegments(int segindex)
 	/* if it was added into readOnlySegments before, delete it now */
 	if (bms_is_member(segindex, MyTmGxactLocal->readOnlySegmentsMap))
 	{
-		if (list_length(MyTmGxactLocal->readOnlySegments) == 1)
-		{
-			MyTmGxactLocal->readOnlySegmentsMap = NULL;
-			MyTmGxactLocal->readOnlySegments = NIL;
-		}
-		else
-		{
-			bms_del_member(MyTmGxactLocal->readOnlySegmentsMap, segindex);
-			list_delete_int(MyTmGxactLocal->readOnlySegments, segindex);
-		}
-	}
+		MyTmGxactLocal->readOnlySegments = list_delete_int(MyTmGxactLocal->readOnlySegments, segindex);
+		MyTmGxactLocal->readOnlySegmentsMap = bms_del_member(MyTmGxactLocal->readOnlySegmentsMap, segindex);
 
+		/* 
+		 * We do not need to free MyTmGxactLocal->readOnlySegmentsMap when 
+		 * list_length(MyTmGxactLocal->readOnlySegments) = 0, which could be used
+		 *  in addToGxactDtxSegments(). 
+		 */
+	}
 	Assert(list_length(MyTmGxactLocal->dtxSegments) +
 		   list_length(MyTmGxactLocal->readOnlySegments) <= getgpsegmentCount());
 
@@ -2492,22 +2493,20 @@ addToGxactReadOnlySegments(int segindex)
 	if (!isCurrentDtxActivated())
 		return;
 
+	/* entry db is just a reader, will not involve in two phase commit */
 	if (segindex < 0)
 		return;
 
 	/* skip if all segdbs are in the list */
-	if (list_length(MyTmGxactLocal->readOnlySegments) >= getgpsegmentCount())
+	if (list_length(MyTmGxactLocal->dtxSegments) + list_length(MyTmGxactLocal->readOnlySegments) >= getgpsegmentCount())
+		return;
+
+	/* skip if already recorded in dtxSegments or readOnlySegments */
+	if (bms_is_member(segindex, MyTmGxactLocal->readOnlySegmentsMap) || 
+		bms_is_member(segindex, MyTmGxactLocal->dtxSegmentsMap))
 		return;
 
 	oldContext = MemoryContextSwitchTo(TopTransactionContext);
-
-	/* skip if already recorded in dtxSegments or readOnlySegments */
-	if (bms_is_member(segindex, MyTmGxactLocal->dtxSegmentsMap) ||
-		bms_is_member(segindex, MyTmGxactLocal->readOnlySegmentsMap))
-	{
-		MemoryContextSwitchTo(oldContext);
-		return;
-	}
 
 	MyTmGxactLocal->readOnlySegmentsMap =
 		bms_add_member(MyTmGxactLocal->readOnlySegmentsMap, segindex);
