@@ -51,6 +51,9 @@ typedef struct CdbDispatcherState
 	bool isGangDestroying;
 #endif
 	bool destroyIdleReaderGang;
+	int  totalSegments;
+	DtxSegmentState *dtxSegmentsState;
+	bool shouldRecordDtxSegments;
 } CdbDispatcherState;
 
 typedef struct DispatcherInternalFuncs
@@ -186,7 +189,8 @@ cdbdisp_cancelDispatch(CdbDispatcherState *ds);
  *
  * Call cdbdisp_destroyDispatcherState to free it.
  */
-CdbDispatcherState * cdbdisp_makeDispatcherState(bool isExtendedQuery);
+CdbDispatcherState *
+cdbdisp_makeDispatcherState(bool isExtendedQuery, bool shouldRecordDtxSegments);
 
 /*
  * Free memory in CdbDispatcherState

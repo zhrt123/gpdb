@@ -3025,7 +3025,32 @@ create_limit_plan(PlannerInfo *root, LimitPath *best_path, int flags)
 	return plan;
 }
 
-
+static int
+chooseSendSliceSegmentForSegmentGeneralLocus(int numSegments)
+{
+	Assert(MyTmGxactLocal != NULL);
+	ListCell	*c;
+	foreach(c, MyTmGxactLocal->writerSegments)
+	{
+		/*
+		 * Need to check if the segindex is within the numsegments,
+		 * since UDF gp_debug_set_create_table_default_numsegments
+		 * can change the number of segments to distribute the table.
+		 */
+		if (lfirst_int(c) < numSegments)
+			return lfirst_int(c);
+	}
+	foreach(c, MyTmGxactLocal->readerSegments)
+	{
+		/*
+		 * Same as above.
+		 */
+		if (lfirst_int(c) < numSegments)
+			return lfirst_int(c);
+	}
+	return gp_session_id % numSegments;
+}
+    
 /*
  * create_motion_plan
  */
@@ -3141,7 +3166,8 @@ create_motion_plan(PlannerInfo *root, CdbMotionPath *path)
 		case CdbLocusType_SegmentGeneral:
 			sendSlice->gangType = GANGTYPE_SINGLETON_READER;
 			sendSlice->numsegments = subpath->locus.numsegments;
-			sendSlice->segindex = gp_session_id % subpath->locus.numsegments;
+			sendSlice->segindex =
+				chooseSendSliceSegmentForSegmentGeneralLocus(subpath->locus.numsegments);
 			break;
 
 		case CdbLocusType_Replicated:
