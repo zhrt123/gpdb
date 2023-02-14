@@ -11,6 +11,7 @@ PGFILEDESC = "isn - data types for international product numbering standards"
 HEADERS_isn = isn.h
 
 REGRESS = isn
+REGRESS_OPTS += --init-file=$(top_srcdir)/src/test/regress/init_file
 
 ifdef USE_PGXS
 PG_CONFIG = pg_config

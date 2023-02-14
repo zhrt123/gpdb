@@ -108,6 +108,18 @@ SELECT '12345679'::ISSN = '9771234567003'::EAN13 AS "ok",
        '9791234567896'::EAN13 != '123456789X'::ISBN AS "nope";
 
 --
+-- test partition table
+--
+CREATE TABLE pt(id ISBN) partition by range (id);
+CREATE TABLE pt_1 partition of pt for values from ('0-11-000533-3!') to ('0-14-121930-0!');
+CREATE TABLE pt_2 partition of pt for values from ('0-14-121930-0!') to ('0-393-04002-X');
+CREATE TABLE pt_3 partition of pt for values from ('0-393-04002-X') to ('2-205-00876-5!');
+insert into pt values ('0-11-000533-3!'), ('0-14-121930-0!'), ('0-393-04002-X');
+SELECT * from pt ORDER BY id;
+\d+ pt
+DROP TABLE pt;
+
+--
 -- cleanup
 --
 DROP EXTENSION isn;
