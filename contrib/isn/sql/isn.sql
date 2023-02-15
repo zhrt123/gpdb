@@ -110,14 +110,25 @@ SELECT '12345679'::ISSN = '9771234567003'::EAN13 AS "ok",
 --
 -- test partition table
 --
-CREATE TABLE pt(id ISBN) partition by range (id);
-CREATE TABLE pt_1 partition of pt for values from ('0-11-000533-3!') to ('0-14-121930-0!');
-CREATE TABLE pt_2 partition of pt for values from ('0-14-121930-0!') to ('0-393-04002-X');
-CREATE TABLE pt_3 partition of pt for values from ('0-393-04002-X') to ('2-205-00876-5!');
-insert into pt values ('0-11-000533-3!'), ('0-14-121930-0!'), ('0-393-04002-X');
-SELECT * from pt ORDER BY id;
+CREATE TABLE pt(id ISBN) PARTITION BY RANGE (id);
+CREATE TABLE pt_1 PARTITION of pt for VALUES FROM ('0-11-000533-3!') TO ('0-14-121930-0!');
+CREATE TABLE pt_2 PARTITION of pt for VALUES FROM ('0-14-121930-0!') TO ('0-393-04002-X');
+CREATE TABLE pt_3 PARTITION of pt for VALUES FROM ('0-393-04002-X') TO ('2-205-00876-5!');
+INSERT INTO pt VALUES ('0-11-000533-3!'), ('0-14-121930-0!'), ('0-393-04002-X');
+SELECT * FROM pt ORDER BY id;
 \d+ pt
+
+explain (costs off) SELECT * FROM pt WHERE id >= '0-11-000533-3!'::ISBN AND id <= '0-14-121930-0!'::ISBN ORDER BY id;
+
 DROP TABLE pt;
+
+--
+-- test distributed by
+--
+CREATE TABLE dt(id ISBN) DISTRIBUTED BY (id);
+INSERT INTO dt VALUES ('0-11-000533-3!'), ('0-14-121930-0!'), ('0-393-04002-X'), ('2-205-00876-5!');
+SELECT * FROM dt ORDER BY id;
+DROP TABLE dt;
 
 --
 -- cleanup
