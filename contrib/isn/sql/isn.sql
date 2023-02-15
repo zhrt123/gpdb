@@ -118,7 +118,7 @@ INSERT INTO pt VALUES ('0-11-000533-3!'), ('0-14-121930-0!'), ('0-393-04002-X');
 SELECT * FROM pt ORDER BY id;
 \d+ pt
 
-explain (costs off) SELECT * FROM pt WHERE id >= '0-11-000533-3!'::ISBN AND id <= '0-14-121930-0!'::ISBN ORDER BY id;
+explain (verbose) SELECT * FROM pt WHERE id >= '0-11-000533-3!'::ISBN AND id <= '0-14-121930-0!'::ISBN ORDER BY id;
 
 DROP TABLE pt;
 

@@ -292,6 +292,26 @@ Partitions: pt_1 FOR VALUES FROM ('0-11-000533-3!') TO ('0-14-121930-0!'),
             pt_3 FOR VALUES FROM ('0-393-04002-X') TO ('2-205-00876-5!')
 Distributed by: (id)
 
+explain (verbose) SELECT * FROM pt WHERE id >= '0-11-000533-3!'::ISBN AND id <= '0-14-121930-0!'::ISBN ORDER BY id;
+                                                QUERY PLAN                                                 
+-----------------------------------------------------------------------------------------------------------
+ Gather Motion 3:1  (slice1; segments: 3)  (cost=958.17..982.57 rows=1722 width=8)
+   Output: pt_1.id
+   Merge Key: pt_1.id
+   ->  Sort  (cost=958.17..959.61 rows=574 width=8)
+         Output: pt_1.id
+         Sort Key: pt_1.id
+         ->  Append  (cost=0.00..931.87 rows=574 width=8)
+               ->  Seq Scan on public.pt_1  (cost=0.00..464.50 rows=287 width=8)
+                     Output: pt_1.id
+                     Filter: ((pt_1.id >= '0-11-000533-3!'::isbn) AND (pt_1.id <= '0-14-121930-0!'::isbn))
+               ->  Seq Scan on public.pt_2  (cost=0.00..464.50 rows=287 width=8)
+                     Output: pt_2.id
+                     Filter: ((pt_2.id >= '0-11-000533-3!'::isbn) AND (pt_2.id <= '0-14-121930-0!'::isbn))
+ Optimizer: Postgres query optimizer
+ Settings: optimizer = 'off'
+(15 rows)
+
 DROP TABLE pt;
 --
 -- test distributed by
