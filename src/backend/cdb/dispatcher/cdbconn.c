@@ -852,8 +852,17 @@ forwardQENotices(void)
 
 				pfree(buf.data);
 			}
-
-			pq_endmessage(&msgbuf);
+			/* 
+			 * pq_endmessage() should be skipped when QD is a bgworker.
+			 * When a primary segment shutdown and QD executes a query by SPI_execute(),
+			 * a notice will be generated. But bgworker connecting to the specified database
+			 * does not estabilish pq with client, which causes deadloop in internal_putbytes().
+			 * So we should skip pq_endmessage() when QD is a bgworker.
+			 */
+			if (IsBackgroundWorker == false)
+			{
+				pq_endmessage(&msgbuf);
+			}
 			free(notice);
 		}
 		PG_CATCH();
