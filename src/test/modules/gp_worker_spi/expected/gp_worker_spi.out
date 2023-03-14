@@ -1,0 +1,126 @@
+-- initialize database
+-- start_ignore
+DROP TABLE IF EXISTS worker_spi.counted1;
+NOTICE:  schema "worker_spi" does not exist, skipping
+NOTICE:  schema "worker_spi" does not exist, skipping  (seg2 127.0.0.1:7004 pid=6450)
+NOTICE:  schema "worker_spi" does not exist, skipping  (seg1 127.0.0.1:7003 pid=6451)
+NOTICE:  schema "worker_spi" does not exist, skipping  (seg0 127.0.0.1:7002 pid=6449)
+DROP SCHEMA IF EXISTS worker_spi;
+NOTICE:  schema "worker_spi" does not exist, skipping
+-- end_ignore
+CREATE SCHEMA worker_spi;
+CREATE TABLE worker_spi.counted1(val int);
+NOTICE:  Table doesn't have 'DISTRIBUTED BY' clause -- Using column named 'val' as the Greenplum Database data distribution key for this table.
+HINT:  The 'DISTRIBUTED BY' clause determines the distribution of data. Make sure column(s) chosen are the optimal data distribution key to minimize skew.
+-- create raise notice function
+CREATE FUNCTION raise_notice_func(gp_segment_id int) RETURNS int LANGUAGE plpgsql AS $$
+DECLARE
+BEGIN
+RAISE NOTICE 'this is raise function';
+RETURN gp_segment_id;
+END;
+$$;
+-- start_ignore
+\! gpconfig -c shared_preload_libraries -v 'gp_worker_spi'
+20230315:11:32:01:006455 gpconfig:zhrt:zhrt-[INFO]:-completed successfully with parameters '-c shared_preload_libraries -v gp_worker_spi'
+\! gpstop -raf
+20230315:11:32:02:006640 gpstop:zhrt:zhrt-[INFO]:-Starting gpstop with args: -raf
+20230315:11:32:02:006640 gpstop:zhrt:zhrt-[INFO]:-Gathering information and validating the environment...
+20230315:11:32:02:006640 gpstop:zhrt:zhrt-[INFO]:-Obtaining Greenplum Coordinator catalog information
+20230315:11:32:02:006640 gpstop:zhrt:zhrt-[INFO]:-Obtaining Segment details from coordinator...
+20230315:11:32:02:006640 gpstop:zhrt:zhrt-[INFO]:-Greenplum Version: 'postgres (Greenplum Database) 7.0.0-beta.1+dev.224.g3ce875dab5 build dev'
+20230315:11:32:02:006640 gpstop:zhrt:zhrt-[INFO]:-Commencing Coordinator instance shutdown with mode='fast'
+20230315:11:32:02:006640 gpstop:zhrt:zhrt-[INFO]:-Coordinator segment instance directory=/home/zhrt/workspace/gpdb/gpAux/gpdemo/datadirs/qddir/demoDataDir-1
+20230315:11:32:02:006640 gpstop:zhrt:zhrt-[INFO]:-Attempting forceful termination of any leftover coordinator process
+20230315:11:32:02:006640 gpstop:zhrt:zhrt-[INFO]:-Terminating processes for segment /home/zhrt/workspace/gpdb/gpAux/gpdemo/datadirs/qddir/demoDataDir-1
+20230315:11:32:02:006640 gpstop:zhrt:zhrt-[INFO]:-Stopping coordinator standby host zhrt mode=fast
+20230315:11:32:02:006640 gpstop:zhrt:zhrt-[INFO]:-Successfully shutdown standby process on zhrt
+20230315:11:32:02:006640 gpstop:zhrt:zhrt-[INFO]:-Targeting dbid [2, 5, 3, 6, 4, 7] for shutdown
+20230315:11:32:02:006640 gpstop:zhrt:zhrt-[INFO]:-Commencing parallel primary segment instance shutdown, please wait...
+20230315:11:32:02:006640 gpstop:zhrt:zhrt-[INFO]:-0.00% of jobs completed
+20230315:11:32:03:006640 gpstop:zhrt:zhrt-[INFO]:-100.00% of jobs completed
+20230315:11:32:03:006640 gpstop:zhrt:zhrt-[INFO]:-Commencing parallel mirror segment instance shutdown, please wait...
+20230315:11:32:03:006640 gpstop:zhrt:zhrt-[INFO]:-0.00% of jobs completed
+20230315:11:32:03:006640 gpstop:zhrt:zhrt-[INFO]:-100.00% of jobs completed
+20230315:11:32:03:006640 gpstop:zhrt:zhrt-[INFO]:-----------------------------------------------------
+20230315:11:32:03:006640 gpstop:zhrt:zhrt-[INFO]:-   Segments stopped successfully      = 6
+20230315:11:32:03:006640 gpstop:zhrt:zhrt-[INFO]:-   Segments with errors during stop   = 0
+20230315:11:32:03:006640 gpstop:zhrt:zhrt-[INFO]:-----------------------------------------------------
+20230315:11:32:03:006640 gpstop:zhrt:zhrt-[INFO]:-Successfully shutdown 6 of 6 segment instances 
+20230315:11:32:03:006640 gpstop:zhrt:zhrt-[INFO]:-Database successfully shutdown with no errors reported
+20230315:11:32:03:006640 gpstop:zhrt:zhrt-[INFO]:-Restarting System...
+-- end_ignore
+\c
+-- wait until the worker completes its initialization
+DO $$
+DECLARE
+	visible bool;
+	loops int := 0;
+BEGIN
+	LOOP
+		visible := table_name IS NOT NULL
+			FROM information_schema.tables
+			WHERE table_name = 'counted1';
+		IF visible OR loops > 120 * 10 THEN EXIT; END IF;
+		PERFORM pg_sleep(0.1);
+		loops := loops + 1;
+	END LOOP;
+END
+$$;
+-- wait until the worker has processed the tuple
+DO $$
+DECLARE
+	count int;
+	loops int := 0;
+BEGIN
+	LOOP
+		count := count(*) FROM worker_spi.counted1;
+		IF count > 0 OR loops > 120 * 10 THEN EXIT; END IF;
+		PERFORM pg_sleep(0.1);
+		loops := loops + 1;
+	END LOOP;
+END
+$$;
+-- the result should be (0, 1, 2)
+SELECT DISTINCT val FROM worker_spi.counted1 ORDER BY val;
+ val 
+-----
+   0
+   1
+   2
+(3 rows)
+
+-- clean database
+DROP FUNCTION raise_notice_func(gp_segment_id int);
+DROP TABLE worker_spi.counted1;
+DROP SCHEMA worker_spi;
+-- start_ignore
+\! gpconfig -c shared_preload_libraries -v ''
+20230315:11:32:06:007504 gpconfig:zhrt:zhrt-[INFO]:-completed successfully with parameters '-c shared_preload_libraries -v '''
+\! gpstop -raf
+20230315:11:32:06:007720 gpstop:zhrt:zhrt-[INFO]:-Starting gpstop with args: -raf
+20230315:11:32:06:007720 gpstop:zhrt:zhrt-[INFO]:-Gathering information and validating the environment...
+20230315:11:32:06:007720 gpstop:zhrt:zhrt-[INFO]:-Obtaining Greenplum Coordinator catalog information
+20230315:11:32:06:007720 gpstop:zhrt:zhrt-[INFO]:-Obtaining Segment details from coordinator...
+20230315:11:32:06:007720 gpstop:zhrt:zhrt-[INFO]:-Greenplum Version: 'postgres (Greenplum Database) 7.0.0-beta.1+dev.224.g3ce875dab5 build dev'
+20230315:11:32:06:007720 gpstop:zhrt:zhrt-[INFO]:-Commencing Coordinator instance shutdown with mode='fast'
+20230315:11:32:06:007720 gpstop:zhrt:zhrt-[INFO]:-Coordinator segment instance directory=/home/zhrt/workspace/gpdb/gpAux/gpdemo/datadirs/qddir/demoDataDir-1
+20230315:11:32:07:007720 gpstop:zhrt:zhrt-[INFO]:-Attempting forceful termination of any leftover coordinator process
+20230315:11:32:07:007720 gpstop:zhrt:zhrt-[INFO]:-Terminating processes for segment /home/zhrt/workspace/gpdb/gpAux/gpdemo/datadirs/qddir/demoDataDir-1
+20230315:11:32:07:007720 gpstop:zhrt:zhrt-[INFO]:-Stopping coordinator standby host zhrt mode=fast
+20230315:11:32:07:007720 gpstop:zhrt:zhrt-[INFO]:-Successfully shutdown standby process on zhrt
+20230315:11:32:07:007720 gpstop:zhrt:zhrt-[INFO]:-Targeting dbid [2, 5, 3, 6, 4, 7] for shutdown
+20230315:11:32:07:007720 gpstop:zhrt:zhrt-[INFO]:-Commencing parallel primary segment instance shutdown, please wait...
+20230315:11:32:07:007720 gpstop:zhrt:zhrt-[INFO]:-0.00% of jobs completed
+20230315:11:32:08:007720 gpstop:zhrt:zhrt-[INFO]:-100.00% of jobs completed
+20230315:11:32:08:007720 gpstop:zhrt:zhrt-[INFO]:-Commencing parallel mirror segment instance shutdown, please wait...
+20230315:11:32:08:007720 gpstop:zhrt:zhrt-[INFO]:-0.00% of jobs completed
+20230315:11:32:08:007720 gpstop:zhrt:zhrt-[INFO]:-100.00% of jobs completed
+20230315:11:32:08:007720 gpstop:zhrt:zhrt-[INFO]:-----------------------------------------------------
+20230315:11:32:08:007720 gpstop:zhrt:zhrt-[INFO]:-   Segments stopped successfully      = 6
+20230315:11:32:08:007720 gpstop:zhrt:zhrt-[INFO]:-   Segments with errors during stop   = 0
+20230315:11:32:08:007720 gpstop:zhrt:zhrt-[INFO]:-----------------------------------------------------
+20230315:11:32:08:007720 gpstop:zhrt:zhrt-[INFO]:-Successfully shutdown 6 of 6 segment instances 
+20230315:11:32:08:007720 gpstop:zhrt:zhrt-[INFO]:-Database successfully shutdown with no errors reported
+20230315:11:32:08:007720 gpstop:zhrt:zhrt-[INFO]:-Restarting System...
+-- end_ignore

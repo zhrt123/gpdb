@@ -863,6 +863,10 @@ forwardQENotices(void)
 			{
 				pq_endmessage(&msgbuf);
 			}
+			else
+			{
+				elog(WARNING, "%s", msgbuf.data);
+			}
 			free(notice);
 		}
 		PG_CATCH();

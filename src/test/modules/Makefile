@@ -21,6 +21,7 @@ SUBDIRS = \
 		  test_rls_hooks \
 		  test_shm_mq \
 		  unsafe_tests \
+		  gp_worker_spi \
 		  worker_spi
 
 # GPDB subdirs
