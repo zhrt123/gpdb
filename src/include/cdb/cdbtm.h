@@ -232,7 +232,7 @@ typedef struct TMGXACTLOCAL
 
 	bool						writerGangLost;
 
-	/* Useed to record segments which has persisted WAL during a dtx */
+	/* Used to record segments which has persisted WAL during a dtx */
 	Bitmapset					*writerSegmentsMap;
 	List						*writerSegments;
 	/*

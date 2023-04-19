@@ -318,7 +318,7 @@ CdbDispatchSetCommand(const char *strCommand, bool cancelOnError)
 	 * two-phase commit isn't involved in dispatching SET command. We set shouldRecordDtxSegments
 	 * to true when the SET command is in an explicit transaction.
 	 */
-	ds = cdbdisp_makeDispatcherState(false, /* shouldRecordDtxSegments */ isDtxExplicitBegin());
+	ds = cdbdisp_makeDispatcherState(false, /* shouldRecordDtxSegments */ false);
 
 	queryText = buildGpQueryString(pQueryParms, &queryTextLength);
 
@@ -467,8 +467,7 @@ cdbdisp_dispatchCommandInternal(DispatchCommandQueryParms *pQueryParms,
 	 * flag is marked as DF_NEED_TWO_PHASE, we need to put the involved
 	 * segments into dtxSegments or readOnlySegments list.
 	 */
-	ds = cdbdisp_makeDispatcherState(false,
-									 (flags & DF_NEED_TWO_PHASE) || isDtxExplicitBegin());
+	ds = cdbdisp_makeDispatcherState(false, flags & DF_NEED_TWO_PHASE);
 
 	/*
 	 * Reader gangs use local snapshot to access catalog, as a result, it will
@@ -1075,8 +1074,7 @@ cdbdisp_dispatchX(QueryDesc* queryDesc,
 
 	rootIdx = RootSliceIndex(estate);
 
-	ds = cdbdisp_makeDispatcherState(queryDesc->extended_query,
-									 planRequiresTxn || isDtxExplicitBegin());
+	ds = cdbdisp_makeDispatcherState(queryDesc->extended_query, planRequiresTxn);
 
 	/*
 	 * Since we intend to execute the plan, inventory the slice tree,
@@ -1338,8 +1336,7 @@ CdbDispatchCopyStart(struct CdbCopy *cdbCopy, Node *stmt, int flags)
 	/*
 	 * Dispatch the command.
 	 */
-	ds = cdbdisp_makeDispatcherState(false,
-									 needTwoPhase || isDtxExplicitBegin());
+	ds = cdbdisp_makeDispatcherState(false, needTwoPhase);
 
 	queryText = buildGpQueryString(pQueryParms, &queryTextLength);
 

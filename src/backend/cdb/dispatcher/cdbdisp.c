@@ -338,7 +338,7 @@ cdbdisp_makeDispatcherState(bool isExtendedQuery, bool shouldRecordDtxSegments)
 	handle->dispatcherState->totalSegments = segmentsCount;
 	handle->dispatcherState->dtxSegmentsState =
 		MemoryContextAllocZero(DispatcherContext, sizeof(DtxSegmentState) * segmentsCount);
-	handle->dispatcherState->shouldRecordDtxSegments = shouldRecordDtxSegments;
+	handle->dispatcherState->shouldRecordDtxSegments = shouldRecordDtxSegments || isDtxExplicitBegin();
 
 	return handle->dispatcherState;
 }
