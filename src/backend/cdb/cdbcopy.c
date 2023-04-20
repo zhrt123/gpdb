@@ -582,10 +582,9 @@ cdbCopyEndInternal(CdbCopy *c, char *abort_msg,
 
 				/*
 				 * Here is a little different from processResults, COPY command
-				 * must use dtx, no need to judge if this is a dtx. Besides,
-				 * addToGxactReadOnlySegments can also be avoided, because cdbCopyStart
-				 * will call processResults, which will add the related segments to
-				 * readOnlySegments list.
+				 * must use dtx, no need to judge if this is a dtx. And cdbCopyStart
+				 * will call processResults, which will add the read-only segments to
+				 * dtxSegments list.
 				 */
 				dtxSegmentsState[q->segindex] = DTX_SEG_WRITER;
 

@@ -301,6 +301,8 @@ CdbDispatchHandleError(struct CdbDispatcherState *ds)
 
 /*
  * Allocate memory and initialize CdbDispatcherState.
+ * shouldRecordDtxSegments: whether need to record the segments involved in the
+ * current transaction to MyTmGxactLocal.
  *
  * Call cdbdisp_destroyDispatcherState to free it.
  */

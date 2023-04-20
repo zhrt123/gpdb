@@ -285,9 +285,9 @@ typedef enum
  */
 typedef enum
 {
-	DTX_SEG_NOT_INVOLVED = 0,
-	DTX_SEG_WRITER,
-	DTX_SEG_READER,
+	DTX_SEG_NOT_INVOLVED = 0,	/* segment does not involve the current transaction */
+	DTX_SEG_WRITER,				/* segment has written xlog in the current transaction */
+	DTX_SEG_READER,				/* segment only execute read operation in the current transaction */
 } DtxSegmentState;
 
 #define DTM_DEBUG3 (Debug_print_full_dtm ? LOG : DEBUG3)
