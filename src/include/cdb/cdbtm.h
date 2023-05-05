@@ -232,12 +232,23 @@ typedef struct TMGXACTLOCAL
 
 	bool						writerGangLost;
 
-	/* Useed to record segments which has persisted WAL during a dtx */
+	/* 
+	 * Used to record segments which has persisted WAL during a dtx.
+	 * writerSegmentsMap: used to check whether a segment is stored
+	 * in writerSegments on QD. For example,
+	 * (bms_is_member(0, writerSegmentsMap) == true) means seg0 is
+	 * stored in writerSegments.
+	 */
 	Bitmapset					*writerSegmentsMap;
 	List						*writerSegments;
+
 	/*
 	 * Used to record segments which are read only during a dtx,
 	 * and those segments don't need prepare phase.
+	 * readerSegmentsMap: used to check whether a segment is stored
+	 * in readerSegments on QD. For example,
+	 * (bms_is_member(0, readerSegmentsMap) == true) means seg0 is
+	 * stored in readerSegments.
 	 */
 	Bitmapset					*readerSegmentsMap;
 	List						*readerSegments;
@@ -274,9 +285,9 @@ typedef enum
  */
 typedef enum
 {
-	DTX_SEG_NOT_INVOLVED = 0,
-	DTX_SEG_WRITER,
-	DTX_SEG_READER,
+	DTX_SEG_NOT_INVOLVED = 0,	/* segment does not involve the current transaction */
+	DTX_SEG_WRITER,				/* segment has written xlog in the current transaction */
+	DTX_SEG_READER,				/* segment only execute read operation in the current transaction */
 } DtxSegmentState;
 
 #define DTM_DEBUG3 (Debug_print_full_dtm ? LOG : DEBUG3)

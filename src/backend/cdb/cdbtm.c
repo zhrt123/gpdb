@@ -2279,18 +2279,21 @@ performDtxProtocolCommand(DtxProtocolCommand dtxProtocolCommand,
 			switch (DistributedTransactionContext)
 			{
 				/*
-				 * Read-only segments did not execute prepare phase, so their context is
+				 * In the two-phase commit, the context of involved segment is
 				 * DTX_CONTEXT_QE_TWO_PHASE_EXPLICIT_WRITER/DTX_CONTEXT_QE_TWO_PHASE_IMPLICIT_WRITER.
-				 * We just run the Commit one-phase operation for these segments.
+				 * Read-only segments just need to execute one-phase commit and do not perform
+				 * prepare phase. So their context will keep DTX_CONTEXT_QE_TWO_PHASE_EXPLICIT_WRITER
+				 * or DTX_CONTEXT_QE_TWO_PHASE_IMPLICIT_WRITER in the commit phase.
+				 * In this case, we just run the commit one-phase operation for these segments.
 				 */
 				case DTX_CONTEXT_QE_TWO_PHASE_EXPLICIT_WRITER:
 				case DTX_CONTEXT_QE_TWO_PHASE_IMPLICIT_WRITER:
 					performDtxProtocolCommitOnePhase(gid);
 					break;
-					/*
-					 * Write segments executed prepare phase, so their context is DTX_CONTEXT_QE_PREPARED.
-					 * And we run the Commit Prepared operation for these segments.
-					 */
+				/*
+				 * Write segments executed prepare phase, so their context is DTX_CONTEXT_QE_PREPARED.
+				 * In this case, we run the commit prepared operation for these segments.
+				 */
 				default:
 					requireDistributedTransactionContext(DTX_CONTEXT_QE_PREPARED);
 					setDistributedTransactionContext(DTX_CONTEXT_QE_FINISH_PREPARED);
@@ -2303,16 +2306,19 @@ performDtxProtocolCommand(DtxProtocolCommand dtxProtocolCommand,
 			switch (DistributedTransactionContext)
 			{
 				/*
-				 * Read-only segments did not execute prepare phase, so their context is
+				 * In the two-phase commit, the context of involved segment is
 				 * DTX_CONTEXT_QE_TWO_PHASE_EXPLICIT_WRITER/DTX_CONTEXT_QE_TWO_PHASE_IMPLICIT_WRITER.
+				 * Read-only segments just need to execute one-phase commit and do not perform
+				 * prepare phase. So their context will keep DTX_CONTEXT_QE_TWO_PHASE_EXPLICIT_WRITER
+				 * or DTX_CONTEXT_QE_TWO_PHASE_IMPLICIT_WRITER in the commit phase.
 				 */
 				case DTX_CONTEXT_QE_TWO_PHASE_EXPLICIT_WRITER:
 				case DTX_CONTEXT_QE_TWO_PHASE_IMPLICIT_WRITER:
 					AbortOutOfAnyTransaction();
 					break;
-					/*
-					 * Write segments executed prepare phase, so their context is DTX_CONTEXT_QE_PREPARED.
-					 */
+				/*
+				 * Write segments executed prepare phase, so their context is DTX_CONTEXT_QE_PREPARED.
+				 */
 				default:
 					requireDistributedTransactionContext(DTX_CONTEXT_QE_PREPARED);
 					setDistributedTransactionContext(DTX_CONTEXT_QE_FINISH_PREPARED);
@@ -2320,6 +2326,7 @@ performDtxProtocolCommand(DtxProtocolCommand dtxProtocolCommand,
 					break;
 			}
 			break;
+
 		case DTX_PROTOCOL_COMMAND_RETRY_COMMIT_PREPARED:
 			requireDistributedTransactionContext(DTX_CONTEXT_LOCAL_ONLY);
 			performDtxProtocolCommitPrepared(gid, /* raiseErrorIfNotFound */ false);
@@ -2423,6 +2430,13 @@ currentGxactWriterGangLost(void)
 	return MyTmGxactLocal->writerGangLost;
 }
 
+/*
+ * Record which segment involved in the two phase commit.
+ * If the status of segment is DTX_SEG_WRITER, the segment will
+ * be added to dtxSegments and writerSegments.
+ * If the status of segment is DTX_SEG_READER, the segment will
+ * be added to dtxSegments.
+ */
 void
 addToGxactDtxSegments(int totalSegments, DtxSegmentState *dtxSegmentsState)
 {
