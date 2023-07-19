@@ -250,7 +250,6 @@ define BUILD_STEPS
 	cp -p $(GPMGMT)/bin/gpload $(INSTLOC)/bin/gpload
 	cp -p $(GPMGMT)/bin/gpload.py $(INSTLOC)/bin/gpload.py
 	$(MAKE) copylibs INSTLOC=$(INSTLOC)
-	cd $(GPMGMT)/bin && $(MAKE) pygresql INSTLOC=$(INSTLOC)
 	$(MAKE) clients INSTLOC=$(INSTLOC) CLIENTSINSTLOC=$(CLIENTSINSTLOC)
 endef
 endif
@@ -368,11 +367,7 @@ define tmpCLIENTS_FILESET_BIN
 endef
 CLIENTS_FILESET_BIN = $(strip $(tmpCLIENTS_FILESET_BIN))
 
-# pg.py, pgdb.py, _pg.so are from pygresql which does not install into a single module
 define tmpCLIENTS_FILESET_BINEXT
-	pg.py
-	pgdb.py
-	_pg*.so
 	yaml
 endef
 CLIENTS_FILESET_BINEXT = $(strip $(tmpCLIENTS_FILESET_BINEXT))
