@@ -1140,12 +1140,6 @@ If you want to review or change any of your installation settings, click Back. C
             </Directory>
             <Directory Id="TOPLEVELlib" Name="lib">
               <Directory Id="PYTHONlib" Name="python">
-                <Component Id="PYGRESQLlib" DiskId="1" Guid="CDFE5977-8F11-43AF-95B7-374510FA872D">
-                  <File Id="__init__.py" Name="__init__.py" Source="$(var.SRCDIR)\lib\python\__init__.py" />
-                  <File Id="_pg.pyd" Name="_pg.pyd" Source="$(var.SRCDIR)\lib\python\_pg.pyd" />
-                  <File Id="pg.py" Name="pg.py" Source="$(var.SRCDIR)\lib\python\pg.py" />
-                  <File Id="pgdb.py" Name="pgdb.py" Source="$(var.SRCDIR)\lib\python\pgdb.py" />
-                </Component>
                 <Directory Id="YAMLlib" Name="yaml">
                   <Component Id="YAMLlib" DiskId="1" Guid="77EAA4D5-888B-4633-BE68-8C81186EAA83">
                     <File Id="composer.py" Name="composer.py" Source="$(var.SRCDIR)\lib\python\yaml\composer.py" />
@@ -1179,7 +1173,6 @@ If you want to review or change any of your installation settings, click Back. C
       <Feature Id="psql" Level="1" Title="Greenplum DB client command line tools" Description="Greenplum DB client command line tools" AllowAdvertise="no" Display="expand">
         <ComponentRef Id="TOPLEVELbin" />
         <ComponentRef Id="GPPYlib" />
-        <ComponentRef Id="PYGRESQLlib" />
         <ComponentRef Id="YAMLlib" />
       </Feature>
     </Feature>
