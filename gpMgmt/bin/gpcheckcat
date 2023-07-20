@@ -20,6 +20,9 @@ Usage: gpcheckcat [<option>] [dbname]
     Test subset options are mutually exclusive, use only one of '-R', '-s', or '-C'.
 
 '''
+from setup_env import setup_env
+setup_env()
+
 import datetime
 import getopt
 import logging

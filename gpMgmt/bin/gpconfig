@@ -11,6 +11,8 @@
 # different values, both might complete successfully yet different segments might have different gucs
 # set(but each will be one of U1, U2, U1U2, U2U1). This is because we start different processes, one per segment,
 # to rewrite the file, and we do not synchronize those.
+from setup_env import setup_env
+setup_env()
 
 import os
 import sys

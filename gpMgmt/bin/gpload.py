@@ -22,6 +22,9 @@ Options:
     --version: print version number and exit
     -?: help
 '''
+from setup_env import setup_env
+setup_env()
+
 import sys
 import yaml
 if sys.hexversion<0x2040400:

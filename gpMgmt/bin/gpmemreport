@@ -23,6 +23,8 @@
 # Reference this Knowledge Base article for usage information
 # https://community.pivotal.io/s/article/how-to-interpret-the-memwatcher-output-memreport?language=en_US
 #------------------------------------------------------------------------
+from setup_env import setup_env
+setup_env()
 
 import gzip
 import itertools

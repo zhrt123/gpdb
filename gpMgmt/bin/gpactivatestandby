@@ -12,6 +12,8 @@ Activates a standby coordinator instance when the primary coordinator instance h
 failed.  Will promote the standby, update the system catalog
 tables to make the standby coordinator instance as the new coordinator.
 """
+from setup_env import setup_env
+setup_env()
 
 import os
 import sys

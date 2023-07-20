@@ -9,6 +9,8 @@
 # limited to the terms and conditions of the License Agreement under which
 # it is provided by or on behalf of VMware, Inc. or its affiliates.
 
+from setup_env import setup_env
+setup_env()
 
 # import mainUtils FIRST to get python version check
 from gppylib.mainUtils import *

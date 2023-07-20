@@ -16,7 +16,8 @@ PROGRAMS= analyzedb gpactivatestandby gpaddmirrors gpcheckcat gpcheckperf \
 	gpcheckresgroupimpl gpconfig gpdeletesystem gpexpand gpinitstandby \
 	gpinitsystem gpload gpload.py gplogfilter gpmovemirrors \
 	gprecoverseg gpreload gpsync gpsd gpssh gpssh-exkeys gpstart \
-	gpstate gpstop minirepro gpmemwatcher gpmemreport gpcheckresgroupv2impl
+	gpstate gpstop minirepro gpmemwatcher gpmemreport gpcheckresgroupv2impl \
+	setup_env.py
 
 installdirs:
 	$(MKDIR_P) '$(DESTDIR)$(bindir)/lib'

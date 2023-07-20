@@ -58,6 +58,8 @@ EXAMPLE
 
 minirepro gptest -h locahost -U gpadmin -p 4444 -q ~/in.sql -f ~/out.sql
 '''
+from setup_env import setup_env
+setup_env()
 
 import pwd
 import os, sys, re, json, platform, subprocess

@@ -1370,10 +1370,10 @@ def start_standbycoordinator(host, datadir, port, era=None,
 
     logger.info("Checking if standby coordinator is running on host: %s  in directory: %s" % (host,datadir))
     cmd = Command("recovery_startup",
-                  ("python3 -c "
+                  ("PYTHONPATH={0} python3 -c "
                    "'from gppylib.commands.gp import recovery_startup; "
-                   """recovery_startup("{0}", "{1}")'""").format(
-                       datadir, port),
+                   """recovery_startup("{1}", "{2}")'""").format(
+                        os.environ.get("GPHOME") + "/lib/python", datadir, port),
                   ctxt=REMOTE, remoteHost=host)
     cmd.run()
     res = cmd.get_results().stderr
@@ -1404,9 +1404,9 @@ def start_standbycoordinator(host, datadir, port, era=None,
         # shell script.
         pid = getPostmasterPID(host, datadir)
         cmd = Command("get pids",
-                      ("python3 -c "
+                      ("PYTHONPATH={0} python3 -c "
                        "'from gppylib.commands import unix; "
-                       "print(unix.getDescendentProcesses({0}))'".format(pid)),
+                       "print(unix.getDescendentProcesses({1}))'".format(os.environ.get("GPHOME") + "/lib/python", pid)),
                       ctxt=REMOTE, remoteHost=host)
         cmd.run()
         logger.debug(str(cmd))
@@ -1602,7 +1602,9 @@ def get_local_db_mode(coordinator_data_dir):
 ######
 def read_postmaster_pidfile(datadir, host=None):
     if host:
-        cmdStr ="""python3 -c 'from {module} import {func}; print({func}("{args}"))'""".format(module=sys.modules[__name__].__name__,
+        cmdStr ="""PYTHONPATH={pythonpath} python3 -c 'from {module} import {func}; print({func}("{args}"))'""".format(
+                                                                                             pythonpath=os.environ.get("GPHOME") + "/lib/python",
+                                                                                             module=sys.modules[__name__].__name__,
                                                                                              func='read_postmaster_pidfile',
                                                                                              args=datadir)
         cmd = Command(name='run this method remotely', cmdStr=cmdStr, ctxt=REMOTE, remoteHost=host)

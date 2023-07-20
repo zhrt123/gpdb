@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 # Copyright (c) 2014 Pivotal inc.
-
+from setup_env import setup_env
+setup_env()
 
 import datetime
 import subprocess

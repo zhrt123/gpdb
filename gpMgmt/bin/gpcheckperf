@@ -31,6 +31,8 @@ Usage: gpcheckperf <options>
     --netperf  : use netperf instead of gpnetbenchServer/gpnetbenchClient
     --buffer-size : the size of the send buffer in kilobytes ( default 8 kilobytes)
 """
+from setup_env import setup_env
+setup_env()
 
 import datetime
 import os

@@ -27,7 +27,8 @@ Usage: gpssh-exkeys [--version] [-?v]
     name cannot appear in the both the new and existing host lists. Host names
     including a user name or port (username@hostname:port) are not accepted.
 '''
-
+from setup_env import setup_env
+setup_env()
 
 import os, sys
 

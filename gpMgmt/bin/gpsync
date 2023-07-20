@@ -15,6 +15,9 @@ Usage: gpsync [--version] [-?v] [-r] [-a] [-p port] [-u user]
 	     -f file      : a file listing all hosts to connect to
              -J character : character to be substitute as hostname [default='=']
 '''
+from setup_env import setup_env
+setup_env()
+
 import os
 import sys
 import getopt

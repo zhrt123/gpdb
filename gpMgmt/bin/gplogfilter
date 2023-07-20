@@ -7,6 +7,9 @@
 #
 
 # import Python standard library modules
+from setup_env import setup_env
+setup_env()
+
 import csv
 import gzip
 import locale
