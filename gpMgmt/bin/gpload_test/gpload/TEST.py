@@ -1,8 +1,14 @@
 #!/usr/bin/env python3
-
-import unittest
 import sys
 import os
+script_dir = os.path.dirname( __file__ )
+module_dir = os.path.join( script_dir, '..', '..',)
+sys.path.append(module_dir)
+
+from setup_env import setup_env
+setup_env()
+
+import unittest
 import string
 import time
 import datetime
