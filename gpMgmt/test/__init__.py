@@ -4,3 +4,5 @@
 from os.path import abspath as _abspath
 __path__[0] = _abspath(__path__[0])
 
+from test.setup_env import setup_env
+setup_env()
