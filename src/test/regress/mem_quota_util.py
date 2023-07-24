@@ -13,9 +13,7 @@ import shutil, time, re, subprocess
 from optparse import OptionParser, OptionGroup
 
 try:
-    from gppylib import gplog
     from multiprocessing import Process
-    from gppylib.commands import unix
 except Exception as e:
     sys.exit('Cannot import modules. Please check that you have sourced greenplum_path.sh. Detail: ' + str(e))
 
