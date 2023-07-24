@@ -20,6 +20,8 @@
 #
 # See comment "How to add a test" below in the program for how to
 # extend this program.
+from setup_env import setup_env
+setup_env()
 
 import argparse
 import time

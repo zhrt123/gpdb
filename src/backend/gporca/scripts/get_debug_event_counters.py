@@ -24,6 +24,8 @@ CDebugCounter class, see file ../libgpos/include/gpos/common/CDebugCounter.h
 #
 # Finally, for each run, we massage the log file lines into a CSV format by removing
 # leading and trailing elements. The result is a CSV file printed to stdout.
+from setup_env import setup_env
+setup_env()
 
 try:
 	from gppylib.db import dbconn
