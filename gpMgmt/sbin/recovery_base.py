@@ -1,3 +1,6 @@
+from setup_env import setup_env
+setup_env()
+
 import functools
 import json
 import os

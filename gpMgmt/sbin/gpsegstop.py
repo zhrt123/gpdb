@@ -6,6 +6,8 @@
 # Internal Use Function.
 #
 #
+from setup_env import setup_env
+setup_env()
 #
 # THIS IMPORT MUST COME FIRST
 #

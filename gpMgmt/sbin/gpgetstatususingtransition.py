@@ -2,6 +2,8 @@
 #
 # Copyright (c) Greenplum Inc 2010. All Rights Reserved. 
 #
+from setup_env import setup_env
+setup_env()
 #
 # THIS IMPORT MUST COME FIRST
 # import mainUtils FIRST to get python version check

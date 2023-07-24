@@ -1,4 +1,7 @@
 #!/usr/bin/env python3
+from setup_env import setup_env
+setup_env()
+
 import os
 import sys
 import abc

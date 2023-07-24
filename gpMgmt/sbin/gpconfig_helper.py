@@ -10,6 +10,8 @@
 #   NEW file in any subsequent operation.  This is because os.rename() POSIX requires does not overwrite the existing
 #   file but swaps the inodes of the files, so the os.rename() does NOT affect any current readers who have already
 #   opened the OLD file.
+from setup_env import setup_env
+setup_env()
 
 try:
     import os

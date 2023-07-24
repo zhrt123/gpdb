@@ -11,7 +11,7 @@ PYCS= gpconfig_helper.pyc gpoperation.pyc gpsegstop.pyc gpcleansegmentdir.pyc \
 
 PROGRAMS= gpconfig_helper.py gpoperation.py gpsegstop.py gpcleansegmentdir.py \
 	gpgetstatususingtransition.py gpsegstart.py packcore seg_update_pg_hba.py \
-	gpsegrecovery.py gpsegsetuprecovery.py recovery_base.py
+	gpsegrecovery.py gpsegsetuprecovery.py recovery_base.py setup_env.py
 
 installdirs:
 	$(MKDIR_P) '$(DESTDIR)$(sbindir)'
