@@ -10,7 +10,9 @@
 # the python script in this directory, and use \! to run it and
 # test in regress/dispatch and regress/gpcopy.
 
-import sys
+import os, sys
+sys.path.insert(0, os.environ.get("GPHOME") + "/lib/python")
+
 from gppylib.db import dbconn
 
 dbnames = ['funny\"db\'with\\\\quotes',    # from regress/dispatch
