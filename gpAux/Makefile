@@ -249,6 +249,7 @@ define BUILD_STEPS
 	cd $(BUILDDIR)/src/bin/gpfdist && $(MAKE) install
 	cp -p $(GPMGMT)/bin/gpload $(INSTLOC)/bin/gpload
 	cp -p $(GPMGMT)/bin/gpload.py $(INSTLOC)/bin/gpload.py
+	cp -p $(GPMGMT)/bin/setup_env.py $(INSTLOC)/bin/setup_env.py
 	$(MAKE) copylibs INSTLOC=$(INSTLOC)
 	cd $(GPMGMT)/bin && $(MAKE) pygresql INSTLOC=$(INSTLOC)
 	$(MAKE) clients INSTLOC=$(INSTLOC) CLIENTSINSTLOC=$(CLIENTSINSTLOC)
@@ -365,6 +366,7 @@ define tmpCLIENTS_FILESET_BIN
 	dropdb
 	createuser
 	dropuser
+	setup_env.py
 endef
 CLIENTS_FILESET_BIN = $(strip $(tmpCLIENTS_FILESET_BIN))
 
@@ -482,6 +484,7 @@ SET_VERSION_SCRIPTS = \
 	bin/gpinitstandby \
 	bin/gpinitsystem \
 	bin/gpload.py \
+	bin/setup_env.py \
 	bin/gplogfilter \
 	bin/gpmovemirrors \
 	bin/gprecoverseg \

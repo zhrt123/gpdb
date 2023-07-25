@@ -1129,6 +1129,7 @@ If you want to review or change any of your installation settings, click Back. C
                 <File Id="libeay32.dll" Name="libeay32.dll" Source="$(var.SRCDIR)\bin\libeay32.dll" />
                 <File Id="zlib.dll" Name="zlib.dll" Source="$(var.SRCDIR)\bin\zlib.dll" />
                 <File Id="gpload.py" Name="gpload.py" Source="$(var.SRCDIR)\bin\gpload.py" />
+                <File Id="gpload.py" Name="setup_env.py" Source="$(var.SRCDIR)\bin\setup_env.py" />
                 <File Id="gpload.bat" Name="gpload.bat" Source="$(var.SRCDIR)\bin\gpload.bat" />
               </Component>
               <Directory Id="GPPYlib" Name="gppylib">
