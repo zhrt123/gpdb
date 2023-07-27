@@ -8,7 +8,6 @@ for i in $INSTALL_PKGS; do
   sudo yum install -y $i
 done
 
-# Needed for psycopg2, or you can source greenplum_path.sh after compiling database and installing python-dependencies then
 sudo yum install -y postgresql 
 sudo yum install -y postgresql-devel
 sudo yum install -y python3-psycopg2
