@@ -58,11 +58,7 @@ PYLIB_DIR=$(SRC)/ext
 core:
 	python3 gpconfig_modules/parse_guc_metadata.py $(DESTDIR)$(prefix)
 
-ifeq ($(with_pythonsrc_ext), yes)
-install: installdirs installprograms core psutil pyyaml
-else
 install: installdirs installprograms core
-endif
 
 #
 # Python Libraries
