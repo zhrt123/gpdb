@@ -65,32 +65,6 @@ install: installdirs installprograms core
 #
 
 #
-# PSUTIL
-#
-PSUTIL_VERSION=5.7.0
-PSUTIL_DIR=psutil-$(PSUTIL_VERSION)
-
-psutil:
-	@echo "--- psutil"
-ifeq "$(findstring $(BLD_ARCH),aix7_ppc_64 )" ""
-	cd $(PYLIB_SRC_EXT)/ && $(TAR) xzf $(PSUTIL_DIR).tar.gz
-	cd $(PYLIB_SRC_EXT)/$(PSUTIL_DIR)/ && env -u CC python3 setup.py build
-	cp -r $(PYLIB_SRC_EXT)/$(PSUTIL_DIR)/build/lib.*/psutil $(PYLIB_DIR)
-endif
-
-#
-# PYYAML
-#
-PYYAML_VERSION=5.3.1
-PYYAML_DIR=PyYAML-$(PYYAML_VERSION)
-
-pyyaml:
-	@echo "--- pyyaml"
-	cd $(PYLIB_SRC_EXT)/ && $(TAR) xzf $(PYYAML_DIR).tar.gz
-	cd $(PYLIB_SRC_EXT)/$(PYYAML_DIR)/ && env -u CC python3 setup.py build
-	cp -r $(PYLIB_SRC_EXT)/$(PYYAML_DIR)/build/lib*-3*/* $(PYLIB_DIR)/
-
-#
 # PYLINT
 #
 
@@ -147,8 +121,6 @@ installcheck: installcheck-bash
 
 clean distclean:
 	rm -rf $(PYLIB_SRC_EXT)/$(PYLINT_DIR)
-	rm -rf $(PYLIB_SRC_EXT)/$(PYGRESQL_DIR)/build
-	rm -rf $(PYLIB_SRC)/$(PYGRESQL_DIR)/build
 	rm -rf *.pyc
 	rm -f analyzedbc gpactivatestandbyc gpaddmirrorsc gpcheckcatc \
 		  gpcheckperfc gpcheckresgroupimplc gpchecksubnetcfgc gpconfigc \
