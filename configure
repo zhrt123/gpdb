@@ -8900,13 +8900,6 @@ fi
 $as_echo "$with_python" >&6; }
 
 
-#
-# Optionally build Python modules for gpMgmt
-#
-{ $as_echo "$as_me:${as_lineno-$LINENO}: checking whether to build Python modules for gpMgmt" >&5
-$as_echo_n "checking whether to build Python modules for gpMgmt... " >&6; }
-
-
 
 #
 # GSSAPI

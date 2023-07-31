@@ -343,7 +343,6 @@ CLIENTS_HOME_DIR=$(BLD_HOME)
 endif
 CLIENTSINSTLOC=$(CLIENTS_HOME_DIR)/greenplum-clients
 CLIENTSINSTLOC_BIN=$(CLIENTSINSTLOC)/bin
-CLIENTSINSTLOC_BINEXT=$(CLIENTSINSTLOC)/bin/ext/
 CLIENTSINSTLOC_EXT=$(CLIENTSINSTLOC)/ext
 CLIENTSINSTLOC_LIB=$(CLIENTSINSTLOC)/lib
 CLIENTSINSTLOC_LIB_PWARE=$(CLIENTSINSTLOC)/lib/pware
@@ -366,11 +365,6 @@ define tmpCLIENTS_FILESET_BIN
 	dropuser
 endef
 CLIENTS_FILESET_BIN = $(strip $(tmpCLIENTS_FILESET_BIN))
-
-define tmpCLIENTS_FILESET_BINEXT
-	yaml
-endef
-CLIENTS_FILESET_BINEXT = $(strip $(tmpCLIENTS_FILESET_BINEXT))
 
 BLD_PYTHON_FILESET=.
 
@@ -411,8 +405,6 @@ else
 	# ---- copy GPDB fileset ----
 	mkdir -p $(CLIENTSINSTLOC_BIN)
 	(cd $(INSTLOC)/bin/ && $(TAR) cf - $(CLIENTS_FILESET_BIN)) | (cd $(CLIENTSINSTLOC_BIN)/ && $(TAR) xpf -)$(check_pipe_for_errors)
-	mkdir -p $(CLIENTSINSTLOC_BINEXT)
-	(cd $(GPMGMT)/bin/ext/ && $(TAR) cf - $(CLIENTS_FILESET_BINEXT)) | (cd $(CLIENTSINSTLOC_BINEXT)/ && $(TAR) xpf -)$(check_pipe_for_errors)
 ifneq "$(PYTHONHOME)" ""
 	mkdir -p $(CLIENTSINSTLOC_EXT)/python
 	(cd $(PYTHONHOME) && $(TAR) cf - $(BLD_PYTHON_FILESET)) | (cd $(CLIENTSINSTLOC_EXT)/python/ && $(TAR) xpf -)$(check_pipe_for_errors)
