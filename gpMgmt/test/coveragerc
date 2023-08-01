@@ -8,6 +8,4 @@ branch = True
 omit =
     */site-packages/*
     */bin/behave
-    */python/psutil/*
-    */python/yaml/*
     */python/lockfile/*
