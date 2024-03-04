@@ -361,8 +361,6 @@ typedef union Datum_U
 
 #define SIZEOF_DATUM 8
 
-typedef Datum *DatumPtr;
-
 #define GET_1_BYTE(datum)	(((Datum) (datum)) & 0x000000ff)
 #define GET_2_BYTES(datum)	(((Datum) (datum)) & 0x0000ffff)
 #define GET_4_BYTES(datum)	(((Datum) (datum)) & 0xffffffff)
