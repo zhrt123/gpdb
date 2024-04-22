@@ -1270,6 +1270,12 @@ InitPostgres(const char *in_dbname, Oid dboid, const char *username,
      * Primary function is to establish connections to the qExecs.
      * This is SKIPPED when the database is in bootstrap mode or 
      * Is not UnderPostmaster.
+	 * 
+	 * When the parallel worker on segments is initializing and 
+	 * connecting to the database, cdb_setup() need to be skipped:
+	 * - MyProcPort is not initliazed in this function which will
+	 *   be used for cdb_setup()
+	 * - InitMotionLayerIPC() is unnecessary for parallel workers.
      */
     if (!bootstrap && IsUnderPostmaster && !InitializingParallelWorker)
     {

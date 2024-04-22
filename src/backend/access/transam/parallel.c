@@ -216,7 +216,7 @@ InitializeParallelDSM(ParallelContext *pcxt)
 	Size		relmapperlen = 0;
 	Size		uncommittedenumslen = 0;
 	Size		segsize = 0;
-	Size		dtxcontextlen = 0;  
+	Size		dtxcontextlen = 0;
 	int			i;
 	FixedParallelState *fps;
 	dsm_handle	session_dsm_handle = DSM_HANDLE_INVALID;
@@ -274,9 +274,13 @@ InitializeParallelDSM(ParallelContext *pcxt)
 		shm_toc_estimate_chunk(&pcxt->estimator, relmapperlen);
 		uncommittedenumslen = EstimateUncommittedEnumsSpace();
 		shm_toc_estimate_chunk(&pcxt->estimator, uncommittedenumslen);
+		/* 
+		 * Estimate space for serialized DtxContextInfo when creating parallel
+		 * workers on QE.
+		 */
 		if (Gp_role == GP_ROLE_EXECUTE)
 		{
-			dtxcontextlen = DtxContextInfo_SerializeSize(&QEDtxContextInfo);;
+			dtxcontextlen = DtxContextInfo_SerializeSize(&QEDtxContextInfo);
 			shm_toc_estimate_chunk(&pcxt->estimator, dtxcontextlen);
 			shm_toc_estimate_keys(&pcxt->estimator, 1);
 		}
@@ -337,7 +341,14 @@ InitializeParallelDSM(ParallelContext *pcxt)
 	fps->parallel_leader_pgproc = MyProc;
 	fps->parallel_leader_pid = MyProcPid;
 	fps->parallel_leader_backend_id = MyBackendId;
-	/* CDB */
+	/* 
+	 * Pass gp_session_id, numsegmentsFromQD and serialized DtxContextInfo to 
+	 * parallel worker.
+	 * - gp_session_id is used for initPostgres().
+	 * - numsegmentsFromQD is only generated from QD, so it should be passed
+	 *   to parallel worker.
+	 * - DtxContextInfo is used for DistributedSnapshot initialization.
+	 */
 	if (Gp_role == GP_ROLE_EXECUTE)
 	{
 		fps->session_id = gp_session_id;
@@ -1414,8 +1425,8 @@ ParallelWorkerMain(Datum main_arg)
 	RestoreGUCState(gucspace);
 	CommitTransactionCommand();
 
+	/* we need to set Gp_is_writer after GUC is restored */
 	Gp_is_writer = false;
-	Gp_role = GP_ROLE_EXECUTE;
 
 	/* Crank up a transaction state appropriate to a parallel worker. */
 	tstatespace = shm_toc_lookup(toc, PARALLEL_KEY_TRANSACTION_STATE, false);
