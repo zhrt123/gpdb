@@ -2,7 +2,7 @@
 
 A machine language-generated embedding is a complex object transformed into a list of numbers (vector) that reflects both the semantic and syntactic relationships of the data. The `pgvector` module provides vector similarity search capabilities for Greenplum Database that enable you to search, store, and query embeddings at large scale.
 
-The Greenplum Database `pgvector` module is equivalent to version 0.5.1 of the `pgvector` module used with PostgreSQL. The limitations of the Greenplum version of the module are described in the [Greenplum Database Limitations](#limits) topic.
+The Greenplum Database `pgvector` module is equivalent to version 0.7.0 of the `pgvector` module used with PostgreSQL. The limitations of the Greenplum version of the module are described in the [Greenplum Database Limitations](#limits) topic.
 
 
 ## <a id="topic_reg"></a>Installing and Registering the Module
@@ -20,7 +20,7 @@ Refer to [Installing Additional Supplied Modules](../../../install_guide/install
 The `pgvector` module is installed when you install or upgrade Greenplum Database. A previous version of the extension will continue to work in existing databases after you upgrade Greenplum. To upgrade to the most recent version of the extension, you must:
 
 ```
-ALTER EXTENSION vector UPDATE TO '0.5.1';
+ALTER EXTENSION vector UPDATE TO '0.7.0';
 ```
 
 in **every** database in which you registered/use the extension.
@@ -42,22 +42,27 @@ Operator | Description
 \+ | Element-wise addition
 \- | Element-wise subtraction
 \* | Element-wise multiplication
+\|\| | concatenate
 &lt;&ndash;&gt; | Euclidean distance
 <#><sup>1</sup> | Negative inner product
 &lt;&equals;&gt; | Cosine distance
+<+> | taxicab distance
 
 <sup>1</sup> Because Greenplum Database supports only `ASC` order index scans on operators, `<#>` returns the *negative* inner product.
 
 ### <a id="funcs"></a>vector Functions
 
-`pgvector` provides the following functions for the `vector data type:
+`pgvector` provides the following functions for the `vector` data type:
 
 Function Name | Description
 --- | ---
+binary_quantize(vector) → bit | binary quantize
 cosine_distance(vector, vector) → double precision | Computes the cosine distance
 inner_product(vector, vector) → double precision | Computes the inner product
 l2_distance(vector, vector) → double precision | Computes the Euclidean distance
 l1_distance(vector, vector) → double precision | Computes the taxicab distance
+l2_normalize(vector) → vector | Normalize with Euclidean norm
+subvector(vector, integer, integer) → vector | subvector
 vector_dims(vector) → integer | Returns the number of dimensions
 vector_norm(vector) → double precision | Computes the Euclidean norm
 
@@ -70,6 +75,78 @@ Function | Description
 avg(vector) → vector | Computes the arithmetic mean
 sum(vector) → vector | Computes the sum of the vector elements
 
+## <a id="halfvec using"></a>About the half vector Types, Operators, and Functions
+`pgvector` provides a `halfvec` data type and the index access methods `ivfflat` and `hnsw`. The type, methods, and the supporting functions and operators provided by the module enable you to perform exact and approximate neighbor search on, and determine L2, inner product, and cosine distance between, embeddings. You can also use the module to store and query embeddings.
+
+### <a id="halfvec datatype"></a>half vector Data Type
+The `halfvec` data type represents an n-dimensional coordinate. Each half vector takes `2 * dimensions + 8` bytes of storage. Each element is a half-precision floating-point number, and all elements must be finite (no `NaN`, `Infinity` or `-Infinity`). Half vectors can have up to 16,000 dimensions.
+
+### <a id="halfvec ops"></a>half vector Operators
+
+`pgvector` provides the following operators for the `halfvec` data type:
+
+Operator | Description
+--- | ---
+\+ | element-wise addition
+\- | element-wise subtraction
+\* | element-wise multiplication
+\|\| | concatenate
+<-> | Euclidean distance
+<#> | negative inner product
+<=> | cosine distance
+<+> | taxicab distance
+
+<sup>1</sup> Because Greenplum Database supports only `ASC` order index scans on operators, `<#>` returns the *negative* inner product.
+
+### <a id="halfvec funcs"></a>half vector Functions
+
+`pgvector` provides the following functions for the `halfvec` data type:
+
+Function Name | Description
+--- | ---
+binary_quantize(halfvec) → bit | binary quantize
+cosine_distance(halfvec, halfvec) → double precision | cosine distance
+inner_product(halfvec, halfvec) → double precision | inner product
+l1_distance(halfvec, halfvec) → double precision | taxicab distance
+l2_distance(halfvec, halfvec) → double precision | Euclidean distance
+l2_norm(halfvec) → double precision | Euclidean norm
+l2_normalize(halfvec) → halfvec | Normalize with Euclidean norm
+subvector(halfvec, integer, integer) → halfvec | subvector
+vector_dims(halfvec) → integer | number of dimensions
+
+### <a id="halfvec agg_funcs"></a>half vector Aggregate Functions
+
+`pgvector` provides the following aggregate functions for the `halfvec` data type:
+
+Function | Description
+--- | ---
+avg(halfvec) → halfvec | average
+sum(halfvec) → halfvec | sum
+
+## <a id="binary vector using"></a>About the binary vector Types, Operators, and Functions
+`pgvector` provides a `binary vector` data type and the index access methods `ivfflat` and `hnsw`. The type, methods, and the supporting functions and operators provided by the module enable you to perform exact and approximate neighbor search on, and determine Hamming and Jaccard distance between, embeddings. You can also use the module to store and query embeddings.
+
+
+### <a id="binary vector datatype"></a>binary vector Data Type
+The `binary vector` only stores 0 or 1 in each dimension. You can use `binary_quantize` convert a vector to the `binary vector`. Each binary vector takes `dimensions / 8 + 8` bytes of storage. See the [Postgres docs](https://www.postgresql.org/docs/current/datatype-bit.html) for more info.
+
+### <a id="binary vector ops"></a>binary vector Operators
+
+`pgvector` provides the following operators for the `binary vector` data type:
+
+Operator | Description
+--- | ---
+<~> | Hamming distance
+<%> | Jaccard distance
+
+### <a id="bit vector funcs"></a>binary vector Functions
+
+`pgvector` provides the following functions for the `binary vector` data type:
+
+Function | Description
+--- | ---
+hamming_distance(bit, bit) → double precision | Hamming distance
+jaccard_distance(bit, bit) → double precision | Jaccard distance
 
 ## <a id="Using"></a>Using the pgvector Module
 
@@ -117,11 +194,73 @@ Delete `vector`s:
 DELETE FROM items WHERE id = 1;
 ```
 
+### <a id="halfvec storing"></a>Examples: Storing Embeddings with halfvec in Greenplum Database
+
+In the following examples, you manipulate a `halfvec` column of a table.
+
+Create a new table with a `halfvec` column with 3 dimensions:
+
+``` sql
+CREATE TABLE items (id bigserial PRIMARY KEY, embedding halfvec(3));
+```
+
+Or add a `halfvec` column to an existing table:
+
+``` sql
+ALTER TABLE items ADD COLUMN embedding halfvec(3);
+```
+
+Insert `halfvec`s into the table:
+
+``` sql
+INSERT INTO items (embedding) VALUES ('[1,2,3]'), ('[4,5,6]');
+```
+
+Upsert `halfvec`s:
+
+``` sql
+INSERT INTO items (id, embedding) VALUES (1, '[1,2,3]'), (2, '[4,5,6]')
+    ON CONFLICT (id) DO UPDATE SET embedding = EXCLUDED.embedding;
+```
+
+Update `halfvec`s:
+
+``` sql
+UPDATE items SET embedding = '[1,2,3]' WHERE id = 1;
+```
+
+Delete `halfvec`s:
+
+``` sql
+DELETE FROM items WHERE id = 1;
+```
+
+### <a id="binary vector storing"></a>Examples: Storing Embeddings with binary vector in Greenplum Database
+
+Use the `bit` type to store binary vectors ([example](https://github.com/pgvector/pgvector-python/blob/master/examples/hash_image_search.py))
+
+```sql
+CREATE TABLE items (id bigserial PRIMARY KEY, embedding bit(3));
+INSERT INTO items (embedding) VALUES ('000'), ('111');
+```
+
+Get the nearest neighbors by Hamming distance:
+
+```sql
+SELECT * FROM items ORDER BY embedding <~> '101' LIMIT 5;
+```
+
+Also supports Jaccard distance (`<%>`)
+
+```sql
+SELECT * FROM items ORDER BY embedding <%> '101' LIMIT 5;
+```
+
 ### <a id="querying"></a>Examples: Querying Embeddings in Greenplum Database
 
 You can query embeddings as follows.
 
-Get the nearest neighbors to a `vector` by L2 distance:
+Get the nearest neighbors to a `vector` or `halfvec` by L2 distance:
 
 ``` sql
 SELECT * FROM items ORDER BY embedding <-> '[3,1,2]' LIMIT 5;
@@ -194,6 +333,11 @@ To achieve good recall, keep the following in mind:
 2. Choose an appropriate number of `lists`. A reasonable initial value is `rows / 1000` for up to 1M rows and `sqrt(rows)` for over 1M rows.
 3. When querying, specify an appropriate number of [probes](#query-options) (higher is better for recall, lower is better for speed). A reasonable initial value is `sqrt(lists)`.
 
+**NOTE:** dimension limitation for index
+- `vector` supports up to 2,000 dimensions.
+- `halfvec` supports up to 4,000 dimensions.
+- `binary vector` supports up to 64,000 dimensions.
+
 The following examples show how to add an index for various distance methods.
 
 #### IVFFlat Examples
@@ -216,7 +360,29 @@ Create an index on the cosine distance:
 CREATE INDEX ON items USING ivfflat (embedding vector_cosine_ops) WITH (lists = 100);
 ```
 
-You can index a `vector` that has up to 2,000 dimensions.
+Create an index on the L2 distance with `halfvec`:
+
+``` sql
+CREATE INDEX ON items USING ivfflat ((embedding::halfvec(3)) halfvec_l2_ops);
+```
+
+Create an index on the inner product with `halfvec`:
+
+``` sql
+CREATE INDEX ON items USING ivfflat ((embedding::halfvec(3)) halfvec_ip_ops) WITH (lists = 100);
+```
+
+Create an index on the cosine distance with `halfvec`:
+
+``` sql
+CREATE INDEX ON items USING ivfflat ((embedding::halfvec(3)) halfvec_cosine_ops) WITH (lists = 100);
+```
+
+Create an index on the Hamming distance with `binary vector`:
+
+```sql
+CREATE INDEX ON items USING ivfflat ((binary_quantize(embedding)::bit(3)) bit_hamming_ops) WITH (lists = 100);
+```
 
 **Query Options**
 
@@ -259,7 +425,47 @@ Create an index on the cosine distance:
 CREATE INDEX ON items USING hnsw (embedding vector_cosine_ops);
 ```
 
-You can index a `vector` that has up to 2,000 dimensions.
+Create an index on the L1 distance:
+
+```sql
+CREATE INDEX ON items USING hnsw (embedding vector_l1_ops);
+```
+
+Create an index on the L2 distance with `halfvec`:
+
+``` sql
+CREATE INDEX ON items USING hnsw ((embedding::halfvec(3)) halfvec_l2_ops);
+```
+
+Create an index on the inner product with `halfvec`:
+
+``` sql
+CREATE INDEX ON items USING hnsw ((embedding::halfvec(3)) halfvec_ip_ops);
+```
+
+Create an index on the cosine distance with `halfvec`:
+
+``` sql
+CREATE INDEX ON items USING hnsw ((embedding::halfvec(3)) halfvec_cosine_ops);
+```
+
+Create an index on the L1 distance with `halfvec`:
+
+```sql
+CREATE INDEX ON items USING hnsw ((embedding::halfvec(3)) halfvec_l1_ops);
+```
+
+Create an index on the Hamming distance with `binary vector`:
+
+```sql
+CREATE INDEX ON items USING hnsw ((binary_quantize(embedding)::bit(3)) bit_hamming_ops);
+```
+
+Create an index on the Jaccard distance with `binary vector`:
+
+```sql
+CREATE INDEX ON items USING hnsw ((binary_quantize(embedding)::bit(3)) bit_jaccard_ops);
+```
 
 HNSW indexes support the following parameters:
 
@@ -373,6 +579,7 @@ CREATE INDEX ON items USING ivfflat (embedding vector_l2_ops) WITH (lists = 1000
 - The Greenplum query optimizer (GPORCA) does not support `ivfflat` and `hnsw` vector indexes. Queries on tables that utilize these index types fall back to the Postgres-based planner.
 - Append-optimized tables cannot use vector indexes.
 - The size of (a vector) index can be larger than the table size.
+- Parallel index creation is temporarily unsupported on Greenplum.
 
 
 ## <a id="addtl_refs"></a>Additional References
