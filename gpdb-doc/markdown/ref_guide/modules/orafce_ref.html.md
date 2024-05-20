@@ -2,7 +2,7 @@
 
 The `orafce` module provides Oracle Compatibility SQL functions in Greenplum Database. These functions target PostgreSQL but can also be used in Greenplum.
 
-The Greenplum Database `orafce` module is a modified version of the [open source Orafce PostgreSQL module extension](https://github.com/orafce/orafce). The modified `orafce` source files for Greenplum Database can be found in the `gpcontrib/orafce` directory in the [Greenplum Database open source project](https://github.com/greenplum-db/gpdb). The source reflects the Orafce 3.6.1 release and additional commits to [3af70a28f6](https://github.com/orafce/orafce/tree/3af70a28f6ab81f43c990fb5661df99a37328b8a).
+The Greenplum Database `orafce` module is a modified version of the [open source Orafce PostgreSQL module extension](https://github.com/orafce/orafce). The modified `orafce` source files for Greenplum Database can be found in the `gpcontrib/orafce` directory in the [Greenplum Database open source project](https://github.com/greenplum-db/gpdb). The source reflects the Orafce 4.9 release.
 
 There are some restrictions and limitations when you use the module in Greenplum Database.
 
